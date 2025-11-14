@@ -1,23 +1,127 @@
 import 'package:flutter/material.dart';
 
+final ColorScheme colorScheme = ColorScheme.fromSeed(
+  seedColor: Colors.cyanAccent,
+);
+
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Overview')),
+      appBar: AppBar(
+        title: const SelectableText('Overview'),
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
+      ),
+      backgroundColor: colorScheme.surface,
       body: Row(
         children: [
           Expanded(
             flex: 2,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Column(children: [NightlightPanel(initStrength: 50.0, initEnabled: true), MonitorsPanel()]),
+              child: Column(
+                children: [
+                  NightlightPanel(initStrength: 50.0, initEnabled: true),
+                  Divider(),
+                  Expanded(child: MonitorsPanel()),
+                ],
+              ),
             ),
           ),
-          Expanded(flex: 1, child: Container(color: Colors.greenAccent)),
+          VerticalDivider(),
+          Expanded(flex: 1, child: ProfilesPanel()),
+          SizedBox(width: 8),
         ],
+      ),
+    );
+  }
+}
+
+class ProfilesPanel extends StatelessWidget {
+  const ProfilesPanel({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: colorScheme.primaryContainer,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          margin: EdgeInsets.only(top: 4.0),
+          child: Center(
+            child: SelectableText(
+              "Profiles",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+            ),
+          ),
+        ),
+        SizedBox(height: 8),
+        Expanded(
+          child: ListView(
+            children: [
+              ProfileItem(name: "Day profile"),
+              ProfileItem(name: "Night profile"),
+              ProfileItem(name: "Coding profile"),
+              ProfileItem(
+                name: "Another profile with a very looooooooong name",
+              ),
+              ProfileItem(name: "name"),
+              ProfileItem(name: "name"),
+              ProfileItem(name: "name"),
+              ProfileItem(name: "name"),
+              ProfileItem(name: "name"),
+              ProfileItem(name: "name"),
+              ProfileItem(name: "name"),
+              ProfileItem(name: "name"),
+              ProfileItem(name: "name"),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ProfileItem extends StatelessWidget {
+  final String name;
+  const ProfileItem({super.key, required this.name});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: SelectableText(
+                name,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+            ),
+            TextButton.icon(
+              onPressed: () {},
+              icon: Icon(Icons.check),
+              label: Text("Set"),
+            ),
+            TextButton.icon(
+              onPressed: () {},
+              icon: Icon(Icons.edit),
+              label: Text("Edit"),
+            ),
+            TextButton.icon(
+              onPressed: () {},
+              icon: Icon(Icons.delete, color: colorScheme.error),
+              label: Text("Delete", style: TextStyle(color: colorScheme.error)),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -31,15 +135,77 @@ class MonitorsPanel extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Monitors",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+        Container(
+          decoration: BoxDecoration(
+            color: colorScheme.primaryContainer,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Center(
+            child: const SelectableText(
+              "Monitors",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+            ),
+          ),
         ),
-        Column(
-          children: [
-            MonitorItem(name: "Monitor 1", initBrightness: 40.0),
-            MonitorItem(name: "A very looooooooong name", initBrightness: 30.0),
-          ],
+        SizedBox(height: 8),
+        Expanded(
+          child: ListView(
+            children: [
+              MonitorItem(name: "Monitor 1", initBrightness: 40.0),
+              MonitorItem(
+                name: "A very looooooooong name",
+                initBrightness: 30.0,
+              ),
+              MonitorItem(
+                name: "A very looooooooong name",
+                initBrightness: 30.0,
+              ),
+              MonitorItem(
+                name: "A very looooooooong name",
+                initBrightness: 30.0,
+              ),
+              MonitorItem(
+                name: "A very looooooooong name",
+                initBrightness: 30.0,
+              ),
+              MonitorItem(
+                name: "A very looooooooong name",
+                initBrightness: 30.0,
+              ),
+              MonitorItem(
+                name: "A very looooooooong name",
+                initBrightness: 30.0,
+              ),
+              MonitorItem(
+                name: "A very looooooooong name",
+                initBrightness: 30.0,
+              ),
+              MonitorItem(
+                name: "A very looooooooong name",
+                initBrightness: 30.0,
+              ),
+              MonitorItem(
+                name: "A very looooooooong name",
+                initBrightness: 30.0,
+              ),
+              MonitorItem(
+                name: "A very looooooooong name",
+                initBrightness: 30.0,
+              ),
+              MonitorItem(
+                name: "A very looooooooong name",
+                initBrightness: 30.0,
+              ),
+              MonitorItem(
+                name: "A very looooooooong name",
+                initBrightness: 30.0,
+              ),
+              MonitorItem(
+                name: "A very looooooooong name",
+                initBrightness: 30.0,
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -63,7 +229,7 @@ class MonitorItem extends StatefulWidget {
 }
 
 class _MonitorItemState extends State<MonitorItem> {
-  double _brightness = 0.0;
+  late double _brightness;
   @override
   void initState() {
     super.initState();
@@ -72,40 +238,47 @@ class _MonitorItemState extends State<MonitorItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          widget.name,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-        ),
-        Spacer(),
-        Row(
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Row(
           children: [
-            SizedBox(
-              width: 300,
-              child: Slider(
-                value: _brightness,
-                onChanged: (value) {
-                  if (widget.onBrightnessChanged != null) {
-                    widget.onBrightnessChanged!(value);
-                  }
-                  setState(() {
-                    _brightness = value;
-                  });
-                },
-                min: 0.0,
-                max: 100.0,
-                divisions: 100,
-                label: "Brightness",
+            Expanded(
+              child: SelectableText(
+                widget.name,
+                style: TextStyle(fontSize: 18),
               ),
             ),
-            Text(
-              "${_brightness.toInt()}",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            Row(
+              children: [
+                SizedBox(
+                  width: 300,
+                  child: Slider(
+                    value: _brightness,
+                    onChanged: (value) {
+                      if (widget.onBrightnessChanged != null) {
+                        widget.onBrightnessChanged!(value);
+                      }
+                      setState(() {
+                        _brightness = value;
+                      });
+                    },
+                    min: 0.0,
+                    max: 100.0,
+                    divisions: 100,
+                    label: "Brightness",
+                  ),
+                ),
+                Text(
+                  "${_brightness.toInt()}",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+              ],
             ),
           ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -129,8 +302,8 @@ class NightlightPanel extends StatefulWidget {
 }
 
 class _NightlightPanelState extends State<NightlightPanel> {
-  double _strength = 0.0;
-  bool _isEnabled = false;
+  late double _strength;
+  late bool _isEnabled;
 
   @override
   void initState() {
@@ -141,54 +314,61 @@ class _NightlightPanelState extends State<NightlightPanel> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      padding: const EdgeInsets.all(4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-      children: [
-        const Text(
-          "Nightlight",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-        ),
-        Row(
-          children: [
-            SizedBox(
-              width: 300,
-              child: Slider(
-                value: _strength,
-                onChanged: _isEnabled
-                    ? (double value) {
-                        if (widget.onStrengthChanged != null) {
-                          widget.onStrengthChanged!(value);
+        children: [
+          const SelectableText(
+            "Nightlight",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+          ),
+          Row(
+            children: [
+              SizedBox(
+                width: 300,
+                child: Slider(
+                  value: _strength,
+                  onChanged: _isEnabled
+                      ? (double value) {
+                          if (widget.onStrengthChanged != null) {
+                            widget.onStrengthChanged!(value);
+                          }
+                          setState(() {
+                            _strength = value;
+                          });
                         }
-                        setState(() {
-                          _strength = value;
-                        });
-                      }
-                    : null,
-                min: 0.0,
-                max: 100.0,
-                divisions: 100,
-                label: 'Strength',
+                      : null,
+                  min: 0.0,
+                  max: 100.0,
+                  divisions: 100,
+                  label: 'Strength',
+                ),
               ),
-            ),
-            Text(
-              "${_strength.toInt()}",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-          ],
-        ),
-        Switch(
-          value: _isEnabled,
-          onChanged: (bool value) {
-            if (widget.onEnabledChanged != null) {
-              widget.onEnabledChanged!(value);
-            }
-            setState(() {
-              _isEnabled = value;
-            });
-          },
-        ),
-      ],
+              Text(
+                "${_strength.toInt()}",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+            ],
+          ),
+          Switch(
+            value: _isEnabled,
+            onChanged: (bool value) {
+              if (widget.onEnabledChanged != null) {
+                widget.onEnabledChanged!(value);
+              }
+              setState(() {
+                _isEnabled = value;
+              });
+            },
+          ),
+        ],
+      ),
     );
   }
 }
