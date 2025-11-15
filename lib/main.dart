@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monitorist/edit_view.dart';
 import 'package:monitorist/home_view.dart';
 
 void main() {
@@ -14,9 +15,18 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Monitorist',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.cyanAccent),
       ),
-      home: const HomeView(),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.cyanAccent,
+          brightness: Brightness.dark,
+        ),
+      ),
+      themeMode: ThemeMode.system,
+      // home: const HomeView(),
+      // home: EditView.editProfile(name: "Profile 1"),
+      home: const EditView.newProfile(),
     );
   }
 }
