@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 
-final ColorScheme colorScheme = ColorScheme.fromSeed(
-  seedColor: Colors.cyanAccent,
-);
-
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
@@ -12,10 +8,10 @@ class HomeView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const SelectableText('Overview'),
-        backgroundColor: colorScheme.primary,
-        foregroundColor: colorScheme.onPrimary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
       ),
-      backgroundColor: colorScheme.surface,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Row(
         children: [
           Expanded(
@@ -49,7 +45,7 @@ class ProfilesPanel extends StatelessWidget {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: colorScheme.primaryContainer,
+            color: Theme.of(context).colorScheme.primaryContainer,
             borderRadius: BorderRadius.circular(8),
           ),
           margin: EdgeInsets.only(top: 4.0),
@@ -80,6 +76,18 @@ class ProfilesPanel extends StatelessWidget {
               ProfileItem(name: "name"),
               ProfileItem(name: "name"),
             ],
+          ),
+        ),
+        SizedBox(
+          width: double.infinity,
+          child: Card(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: TextButton.icon(
+              onPressed: () {},
+              icon: Icon(Icons.add),
+              label: Text("Add Profile"),
+            ),
           ),
         ),
       ],
@@ -117,8 +125,14 @@ class ProfileItem extends StatelessWidget {
             ),
             TextButton.icon(
               onPressed: () {},
-              icon: Icon(Icons.delete, color: colorScheme.error),
-              label: Text("Delete", style: TextStyle(color: colorScheme.error)),
+              icon: Icon(
+                Icons.delete,
+                color: Theme.of(context).colorScheme.error,
+              ),
+              label: Text(
+                "Delete",
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
             ),
           ],
         ),
@@ -137,7 +151,7 @@ class MonitorsPanel extends StatelessWidget {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: colorScheme.primaryContainer,
+            color: Theme.of(context).colorScheme.primaryContainer,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Center(
@@ -316,7 +330,7 @@ class _NightlightPanelState extends State<NightlightPanel> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainer,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(8),
       ),
       padding: const EdgeInsets.all(4.0),
