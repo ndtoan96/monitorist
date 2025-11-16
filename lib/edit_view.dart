@@ -78,15 +78,40 @@ class _EditViewState extends State<EditView> {
         mainAxisSize: MainAxisSize.min,
         children: [
           FloatingActionButton(
+            heroTag: "saveBtn",
             onPressed: () {
               // Save profile changes
+              Navigator.of(context).pop();
             },
             child: Icon(Icons.save),
           ),
           SizedBox(width: 16),
           FloatingActionButton(
-            onPressed: () {
+            heroTag: "cancelBtn",
+            onPressed: () async {
               // Cancel editing
+              bool? confirmed = await showDialog<bool>(
+                context: context,
+                builder: (dialogContext) => AlertDialog(
+                  title: Text("Discard changes?"),
+                  content: Text(
+                    "Are you sure you want to discard your changes?",
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(dialogContext).pop(false),
+                      child: Text("No"),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(dialogContext).pop(true),
+                      child: Text("Yes"),
+                    ),
+                  ],
+                ),
+              );
+              if (confirmed == true && context.mounted) {
+                Navigator.of(context).pop();
+              }
             },
             child: Icon(Icons.cancel),
           ),

@@ -24,9 +24,8 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: ThemeMode.system,
-      // home: const HomeView(),
-      // home: EditView.editProfile(name: "Profile 1"),
-      home: const EditView.newProfile(),
+      home: const HomeView(),
+      // home: EditView.newProfile(),
     );
   }
 }

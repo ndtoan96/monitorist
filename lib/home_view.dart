@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monitorist/edit_view.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -84,7 +85,11 @@ class ProfilesPanel extends StatelessWidget {
             color: Theme.of(context).colorScheme.surfaceContainerHighest,
             margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: TextButton.icon(
-              onPressed: () {},
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const EditView.newProfile(),
+                ),
+              ),
               icon: Icon(Icons.add),
               label: Text("Add Profile"),
             ),
@@ -119,12 +124,39 @@ class ProfileItem extends StatelessWidget {
               label: Text("Set"),
             ),
             TextButton.icon(
-              onPressed: () {},
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => EditView.editProfile(name: name),
+                ),
+              ),
               icon: Icon(Icons.edit),
               label: Text("Edit"),
             ),
             TextButton.icon(
-              onPressed: () {},
+              onPressed: () async {
+                bool? confirmed = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text("Confirm Deletion"),
+                    content: Text(
+                      "Are you sure you want to delete the profile '$name'?",
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: Text("Cancel"),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: Text("Delete"),
+                      ),
+                    ],
+                  ),
+                );
+                if (confirmed == true) {
+                  // Delete the profile
+                }
+              },
               icon: Icon(
                 Icons.delete,
                 color: Theme.of(context).colorScheme.error,
