@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:monitorist/edit_view.dart';
+import 'package:monitorist/viewmodels/nightlight_panel_viewmodel.dart';
+import 'package:provider/provider.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -21,7 +23,11 @@ class HomeView extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  NightlightPanel(initStrength: 50.0, initEnabled: true),
+                  Consumer<NightlightPanelViewmodel>(
+                    builder: (context, viewModel, child) {
+                      return NightlightPanel(viewModel: viewModel);
+                    },
+                  ),
                   Divider(),
                   Expanded(child: MonitorsPanel()),
                 ],
@@ -329,34 +335,10 @@ class _MonitorItemState extends State<MonitorItem> {
   }
 }
 
-class NightlightPanel extends StatefulWidget {
-  final double initStrength;
-  final bool initEnabled;
-  final Function(double)? onStrengthChanged;
-  final Function(bool)? onEnabledChanged;
+class NightlightPanel extends StatelessWidget {
+  final NightlightPanelViewmodel viewModel;
 
-  const NightlightPanel({
-    super.key,
-    required this.initStrength,
-    required this.initEnabled,
-    this.onStrengthChanged,
-    this.onEnabledChanged,
-  });
-
-  @override
-  State<NightlightPanel> createState() => _NightlightPanelState();
-}
-
-class _NightlightPanelState extends State<NightlightPanel> {
-  late double _strength;
-  late bool _isEnabled;
-
-  @override
-  void initState() {
-    super.initState();
-    _strength = 50.0;
-    _isEnabled = true;
-  }
+  const NightlightPanel({super.key, required this.viewModel});
 
   @override
   Widget build(BuildContext context) {
@@ -374,43 +356,38 @@ class _NightlightPanelState extends State<NightlightPanel> {
             "Nightlight",
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
           ),
-          Row(
-            children: [
-              SizedBox(
-                width: 300,
-                child: Slider(
-                  value: _strength,
-                  onChanged: _isEnabled
-                      ? (double value) {
-                          if (widget.onStrengthChanged != null) {
-                            widget.onStrengthChanged!(value);
-                          }
-                          setState(() {
-                            _strength = value;
-                          });
-                        }
-                      : null,
-                  min: 0.0,
-                  max: 100.0,
-                  divisions: 100,
-                  label: 'Strength',
-                ),
-              ),
-              Text(
-                "${_strength.toInt()}",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              ),
-            ],
-          ),
+          viewModel.strength != null
+              ? Row(
+                  children: [
+                    SizedBox(
+                      width: 300,
+                      child: Slider(
+                        value: viewModel.strength!,
+                        onChanged: viewModel.isEnabled
+                            ? (double value) {
+                                viewModel.setStrength(value);
+                              }
+                            : null,
+                        min: 0.0,
+                        max: 100.0,
+                        divisions: 100,
+                        label: 'Strength',
+                      ),
+                    ),
+                    Text(
+                      "${viewModel.strength!.toInt()}",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                )
+              : SizedBox.shrink(),
           Switch(
-            value: _isEnabled,
+            value: viewModel.isEnabled,
             onChanged: (bool value) {
-              if (widget.onEnabledChanged != null) {
-                widget.onEnabledChanged!(value);
-              }
-              setState(() {
-                _isEnabled = value;
-              });
+              viewModel.setActive(value);
             },
           ),
         ],

@@ -6,7 +6,9 @@ class NightlightPanelViewmodel extends ChangeNotifier {
   double? _strength;
   bool _isEnabled = false;
 
-  NightlightPanelViewmodel({required this.nightlightService});
+  NightlightPanelViewmodel({required this.nightlightService}) {
+    loadSettings();
+  }
 
   double? get strength => _strength;
   bool get isEnabled => _isEnabled;
