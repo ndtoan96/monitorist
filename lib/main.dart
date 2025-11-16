@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:monitorist/home_view.dart';
+import 'package:monitorist/src/rust/frb_generated.dart';
 
-void main() {
+Future<void> main() async {
+  await RustLib.init();
   runApp(const MyApp());
 }
 

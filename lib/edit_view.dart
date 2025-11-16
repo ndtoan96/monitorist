@@ -206,10 +206,7 @@ class _MonitorCardState extends State<MonitorCard> {
     if (widget.existed) {
       return card;
     } else {
-      return Tooltip(
-        message: "This monitor does not exist",
-        child: card,
-      );
+      return Tooltip(message: "This monitor does not exist", child: card);
     }
   }
 }
