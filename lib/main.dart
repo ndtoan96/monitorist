@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:monitorist/edit_view.dart';
 import 'package:monitorist/home_view.dart';
 
 void main() {
@@ -25,7 +24,6 @@ class MyApp extends StatelessWidget {
       ),
       themeMode: ThemeMode.system,
       home: const HomeView(),
-      // home: EditView.newProfile(),
     );
   }
 }

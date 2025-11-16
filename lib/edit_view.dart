@@ -68,7 +68,7 @@ class _EditViewState extends State<EditView> {
                 MonitorCard(name: "Monitor 1", brightness: 50),
                 MonitorCard(name: "Monitor 2", brightness: 50),
                 MonitorCard(name: "Monitor 3", brightness: 50),
-                MonitorCard(name: "Monitor 4", brightness: 50),
+                MonitorCard(name: "Monitor 4", brightness: 50, existed: false),
               ],
             ),
           ),
@@ -124,8 +124,14 @@ class _EditViewState extends State<EditView> {
 class MonitorCard extends StatefulWidget {
   final String name;
   final double brightness;
+  final bool existed;
 
-  const MonitorCard({super.key, required this.name, required this.brightness});
+  const MonitorCard({
+    super.key,
+    required this.name,
+    required this.brightness,
+    this.existed = true,
+  });
 
   @override
   State<MonitorCard> createState() => _MonitorCardState();
@@ -143,39 +149,68 @@ class _MonitorCardState extends State<MonitorCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            Tooltip(
-              message: "Include this monitor in the profile",
-              child: Checkbox(
-                value: _included,
-                onChanged: (bool? value) {
-                  setState(() {
-                    _included = value ?? true;
-                  });
-                },
+    final card = Card(
+      child: Container(
+        decoration: widget.existed
+            ? null
+            : BoxDecoration(
+                border: Border.all(color: Theme.of(context).colorScheme.error),
+                borderRadius: BorderRadius.circular(12.0),
+                color: Theme.of(context).colorScheme.errorContainer,
               ),
-            ),
-            Text(widget.name),
-            Slider(
-              value: _brightness,
-              onChanged: (double value) {
-                setState(() {
-                  _brightness = value;
-                });
-              },
-              min: 0,
-              max: 100,
-              divisions: 100,
-            ),
-            Text(_brightness.toInt().toString()),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              Tooltip(
+                message: "Include this monitor in the profile",
+                child: Checkbox(
+                  value: _included,
+                  onChanged: widget.existed
+                      ? (bool? value) {
+                          setState(() {
+                            _included = value ?? true;
+                          });
+                        }
+                      : null,
+                ),
+              ),
+              Text(widget.name),
+              Slider(
+                value: _brightness,
+                onChanged: widget.existed
+                    ? (double value) {
+                        setState(() {
+                          _brightness = value;
+                        });
+                      }
+                    : null,
+                min: 0,
+                max: 100,
+                divisions: 100,
+              ),
+              Text(_brightness.toInt().toString()),
+              Spacer(),
+              widget.existed
+                  ? SizedBox.shrink()
+                  : IconButton(
+                      onPressed: () {},
+                      icon: Icon(Icons.cancel),
+                      tooltip: "Remove this monitor from the profile",
+                    ),
+            ],
+          ),
         ),
       ),
     );
+    if (widget.existed) {
+      return card;
+    } else {
+      return Tooltip(
+        message: "This monitor does not exist",
+        child: card,
+      );
+    }
   }
 }
 
