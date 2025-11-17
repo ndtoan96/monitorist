@@ -14,6 +14,8 @@ abstract class Monitor implements RustOpaqueInterface {
 
   Future<String> devicePath();
 
+  Future<String> displayName();
+
   Future<String> friendlyDeviceName();
 
   Future<int> getBrightness();

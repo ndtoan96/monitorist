@@ -27,8 +27,8 @@ Future<void> main() async {
             monitorsService: context.read<MonitorsService>(),
           ),
         ),
-        Provider(
-          create: (context) => ProfilesPanelViewmodel(
+        ChangeNotifierProvider(
+          create: (context) => ProfilesViewmodel(
             profilesService: context.read<ProfilesService>(),
           ),
         ),

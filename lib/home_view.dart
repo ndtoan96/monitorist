@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:monitorist/edit_view.dart';
+import 'package:monitorist/services/monitors_service.dart';
+import 'package:monitorist/services/nightlight_service.dart';
+import 'package:monitorist/viewmodels/edit_profile_viewmodel.dart';
 import 'package:monitorist/viewmodels/monitors_viewmodel.dart';
 import 'package:monitorist/viewmodels/nightlight_viewmodel.dart';
 import 'package:monitorist/viewmodels/profiles_viewmodel.dart';
@@ -45,7 +48,7 @@ class HomeView extends StatelessWidget {
           VerticalDivider(),
           Expanded(
             flex: 1,
-            child: Consumer<ProfilesPanelViewmodel>(
+            child: Consumer<ProfilesViewmodel>(
               builder: (context, viewModel, child) {
                 return ProfilesPanel(viewModel: viewModel);
               },
@@ -59,8 +62,8 @@ class HomeView extends StatelessWidget {
 }
 
 class ProfilesPanel extends StatelessWidget {
-  final ProfilesPanelViewmodel _viewModel;
-  const ProfilesPanel({super.key, required ProfilesPanelViewmodel viewModel})
+  final ProfilesViewmodel _viewModel;
+  const ProfilesPanel({super.key, required ProfilesViewmodel viewModel})
     : _viewModel = viewModel;
 
   @override
@@ -83,7 +86,8 @@ class ProfilesPanel extends StatelessWidget {
         SizedBox(height: 8),
         Expanded(
           child: ListView(
-            children: _viewModel.profileNames
+            children: _viewModel.profiles
+                .map((profile) => profile.name)
                 .map(
                   (name) => ProfileItem(
                     name: name,
@@ -99,11 +103,24 @@ class ProfilesPanel extends StatelessWidget {
             color: Theme.of(context).colorScheme.surfaceContainerHighest,
             margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: TextButton.icon(
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const EditView.newProfile(),
-                ),
-              ),
+              onPressed: () {
+                final editorProfileViewmodel = EditProfileViewmodel.newProfile(
+                  nightlightService: context.read<NightlightService>(),
+                  monitorsService: context.read<MonitorsService>(),
+                  profilesViewmodel: context.read<ProfilesViewmodel>(),
+                );
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ChangeNotifierProvider.value(
+                      value: editorProfileViewmodel,
+                      child: Consumer<EditProfileViewmodel>(
+                        builder: (context, viewmodel, child) =>
+                            EditView(viewmodel: viewmodel),
+                      ),
+                    ),
+                  ),
+                );
+              },
               icon: Icon(Icons.add),
               label: Text("Add Profile"),
             ),
@@ -139,11 +156,12 @@ class ProfileItem extends StatelessWidget {
               label: Text("Set"),
             ),
             TextButton.icon(
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => EditView.editProfile(name: name),
-                ),
-              ),
+              onPressed: () {},
+              // => Navigator.of(context).push(
+              //   MaterialPageRoute(
+              //     builder: (context) => EditView.editProfile(name: name),
+              //   ),
+              // ),
               icon: Icon(Icons.edit),
               label: Text("Edit"),
             ),

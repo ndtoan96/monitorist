@@ -25,6 +25,20 @@ impl Monitor {
             .await
     }
 
+    pub async fn display_name(&self) -> Result<String, brightness::Error> {
+        let friendly_name = self.friendly_device_name().await?;
+        if friendly_name.is_empty() {
+            let description = self.device_description()?;
+            if description.is_empty() {
+                self.device_name().await
+            } else {
+                Ok(description)
+            }
+        } else {
+            Ok(friendly_name)
+        }
+    }
+
     pub async fn device_name(&self) -> Result<String, brightness::Error> {
         Ok(self.0.device_name().await?)
     }

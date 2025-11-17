@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:monitorist/viewmodels/edit_profile_viewmodel.dart';
+import 'package:provider/provider.dart';
 
 class EditView extends StatefulWidget {
-  final bool isNew;
-  final String name;
-  const EditView.newProfile({super.key}) : isNew = true, name = "New Profile";
-  const EditView.editProfile({super.key, required this.name}) : isNew = false;
+  final EditProfileViewmodel _viewmodel;
+
+  const EditView({super.key, required EditProfileViewmodel viewmodel})
+    : _viewmodel = viewmodel;
 
   @override
   State<EditView> createState() => _EditViewState();
 }
 
 class _EditViewState extends State<EditView> {
-  bool _preview = true;
   late TextEditingController _nameController;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.name);
+    _nameController = TextEditingController(text: widget._viewmodel.name);
   }
 
   @override
@@ -30,7 +31,9 @@ class _EditViewState extends State<EditView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: widget.isNew ? Text("New Profile") : Text("Edit Profile"),
+        title: widget._viewmodel.isNew
+            ? Text("New Profile")
+            : Text("Edit Profile"),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
       ),
@@ -44,32 +47,39 @@ class _EditViewState extends State<EditView> {
                   controller: _nameController,
                   decoration: InputDecoration(border: OutlineInputBorder()),
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  onChanged: (value) {
-                    // Handle name change if needed
-                  },
+                  onChanged: widget._viewmodel.setName,
                 ),
               ),
               Checkbox(
-                value: _preview,
+                value: widget._viewmodel.preview,
                 onChanged: (bool? value) {
-                  setState(() {
-                    _preview = value ?? true;
-                  });
+                  widget._viewmodel.setPreview(value ?? true);
                 },
               ),
               const Text("Preview"),
             ],
           ),
-          NightlightCard(strength: 50),
+          ChangeNotifierProvider.value(
+            value: widget._viewmodel.nightlightCardViewmodel,
+            child: Consumer<NightlightCardViewmodel>(
+              builder: (context, viewmodel, child) =>
+                  NightlightCard(viewmodel: viewmodel),
+            ),
+          ),
           Divider(),
           Expanded(
             child: ListView(
-              children: [
-                MonitorCard(name: "Monitor 1", brightness: 50),
-                MonitorCard(name: "Monitor 2", brightness: 50),
-                MonitorCard(name: "Monitor 3", brightness: 50),
-                MonitorCard(name: "Monitor 4", brightness: 50, existed: false),
-              ],
+              children: widget._viewmodel.monitorCardViewmodels
+                  .map(
+                    (vm) => ChangeNotifierProvider.value(
+                      value: vm,
+                      child: Consumer<MonitorCardViewmodel>(
+                        builder: (context, viewmodel, child) =>
+                            MonitorCard(viewmodel: viewmodel),
+                      ),
+                    ),
+                  )
+                  .toList(),
             ),
           ),
         ],
@@ -80,7 +90,7 @@ class _EditViewState extends State<EditView> {
           FloatingActionButton(
             heroTag: "saveBtn",
             onPressed: () {
-              // Save profile changes
+              widget._viewmodel.saveProfile();
               Navigator.of(context).pop();
             },
             child: Icon(Icons.save),
@@ -121,37 +131,17 @@ class _EditViewState extends State<EditView> {
   }
 }
 
-class MonitorCard extends StatefulWidget {
-  final String name;
-  final double brightness;
-  final bool existed;
+class MonitorCard extends StatelessWidget {
+  final MonitorCardViewmodel _viewmodel;
 
-  const MonitorCard({
-    super.key,
-    required this.name,
-    required this.brightness,
-    this.existed = true,
-  });
-
-  @override
-  State<MonitorCard> createState() => _MonitorCardState();
-}
-
-class _MonitorCardState extends State<MonitorCard> {
-  bool _included = true;
-  late double _brightness;
-
-  @override
-  void initState() {
-    super.initState();
-    _brightness = widget.brightness;
-  }
+  const MonitorCard({super.key, required MonitorCardViewmodel viewmodel})
+    : _viewmodel = viewmodel;
 
   @override
   Widget build(BuildContext context) {
     final card = Card(
       child: Container(
-        decoration: widget.existed
+        decoration: _viewmodel.exists
             ? null
             : BoxDecoration(
                 border: Border.all(color: Theme.of(context).colorScheme.error),
@@ -165,33 +155,25 @@ class _MonitorCardState extends State<MonitorCard> {
               Tooltip(
                 message: "Include this monitor in the profile",
                 child: Checkbox(
-                  value: _included,
-                  onChanged: widget.existed
+                  value: _viewmodel.isIncluded,
+                  onChanged: _viewmodel.exists
                       ? (bool? value) {
-                          setState(() {
-                            _included = value ?? true;
-                          });
+                          _viewmodel.setIncluded(value ?? true);
                         }
                       : null,
                 ),
               ),
-              Text(widget.name),
+              Text(_viewmodel.name),
               Slider(
-                value: _brightness,
-                onChanged: widget.existed
-                    ? (double value) {
-                        setState(() {
-                          _brightness = value;
-                        });
-                      }
-                    : null,
+                value: _viewmodel.brightness,
+                onChanged: _viewmodel.exists ? _viewmodel.setBrightness : null,
                 min: 0,
                 max: 100,
                 divisions: 100,
               ),
-              Text(_brightness.toInt().toString()),
+              Text(_viewmodel.brightness.toInt().toString()),
               Spacer(),
-              widget.existed
+              _viewmodel.exists
                   ? SizedBox.shrink()
                   : IconButton(
                       onPressed: () {},
@@ -203,7 +185,7 @@ class _MonitorCardState extends State<MonitorCard> {
         ),
       ),
     );
-    if (widget.existed) {
+    if (_viewmodel.exists) {
       return card;
     } else {
       return Tooltip(message: "This monitor does not exist", child: card);
@@ -212,25 +194,15 @@ class _MonitorCardState extends State<MonitorCard> {
 }
 
 class NightlightCard extends StatefulWidget {
-  final double strength;
-  const NightlightCard({super.key, required this.strength});
+  final NightlightCardViewmodel _viewmodel;
+  const NightlightCard({super.key, required NightlightCardViewmodel viewmodel})
+    : _viewmodel = viewmodel;
 
   @override
   State<NightlightCard> createState() => _NightlightCardState();
 }
 
 class _NightlightCardState extends State<NightlightCard> {
-  bool _included = true;
-  late double _strength;
-  late bool _isEnabled;
-
-  @override
-  void initState() {
-    super.initState();
-    _strength = 50;
-    _isEnabled = true;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -241,36 +213,30 @@ class _NightlightCardState extends State<NightlightCard> {
             Tooltip(
               message: "Include nightlight setting in the profile",
               child: Checkbox(
-                value: _included,
+                value: widget._viewmodel.isIncluded,
                 onChanged: (bool? value) {
-                  setState(() {
-                    _included = value ?? true;
-                  });
+                  widget._viewmodel.setIncluded(value ?? true);
                 },
               ),
             ),
             Text("Nightlight"),
-            Slider(
-              value: _strength,
-              onChanged: _isEnabled
-                  ? (double value) {
-                      setState(() {
-                        _strength = value;
-                      });
-                    }
-                  : null,
-              min: 0,
-              max: 100,
-              divisions: 100,
-            ),
-            Text(_strength.toInt().toString()),
+            widget._viewmodel.strength != null
+                ? Slider(
+                    value: widget._viewmodel.strength!,
+                    onChanged: widget._viewmodel.isEnabled
+                        ? widget._viewmodel.setStrength
+                        : null,
+                    min: 0,
+                    max: 100,
+                    divisions: 100,
+                  )
+                : SizedBox.shrink(),
+            widget._viewmodel.strength != null
+                ? Text(widget._viewmodel.strength!.toInt().toString())
+                : SizedBox.shrink(),
             Switch(
-              value: _isEnabled,
-              onChanged: (bool value) {
-                setState(() {
-                  _isEnabled = value;
-                });
-              },
+              value: widget._viewmodel.isEnabled,
+              onChanged: widget._viewmodel.setEnabled,
             ),
           ],
         ),

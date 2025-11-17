@@ -31,18 +31,7 @@ class MonitorItemViewmodel extends ChangeNotifier {
   double get brightness => _brightness;
 
   Future<void> loadSettings() async {
-    final friendlyName = await _monitor.friendlyDeviceName();
-    if (friendlyName.isNotEmpty) {
-      _name = friendlyName;
-    } else {
-      final description = await _monitor.deviceDescription();
-      if (description.isNotEmpty) {
-        _name = description;
-      } else {
-        _name = await _monitor.deviceName();
-      }
-    }
-
+    _name = await _monitor.displayName();
     final brightnessValue = await _monitor.getBrightness();
     _brightness = brightnessValue.toDouble();
     notifyListeners();

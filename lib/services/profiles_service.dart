@@ -108,7 +108,7 @@ class Profile {
 
 class NightlightProfile {
   final bool isEnabled;
-  final double strength;
+  final double? strength;
 
   NightlightProfile({required this.isEnabled, required this.strength});
   factory NightlightProfile.fromJson(Map<String, dynamic> json) {
