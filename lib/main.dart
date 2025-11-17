@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:monitorist/home_view.dart';
 import 'package:monitorist/services/monitors_service.dart';
 import 'package:monitorist/services/nightlight_service.dart';
+import 'package:monitorist/services/profiles_service.dart';
 import 'package:monitorist/src/rust/frb_generated.dart';
 import 'package:monitorist/viewmodels/monitors_viewmodel.dart';
 import 'package:monitorist/viewmodels/nightlight_viewmodel.dart';
+import 'package:monitorist/viewmodels/profiles_viewmodel.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
@@ -14,6 +16,7 @@ Future<void> main() async {
       providers: [
         Provider(create: (_) => NightlightService()),
         Provider(create: (_) => MonitorsService()),
+        Provider(create: (_) => ProfilesService()),
         ChangeNotifierProvider(
           create: (context) => NightlightPanelViewmodel(
             nightlightService: context.read<NightlightService>(),
@@ -22,6 +25,11 @@ Future<void> main() async {
         Provider(
           create: (context) => MonitorsPanelViewmodel(
             monitorsService: context.read<MonitorsService>(),
+          ),
+        ),
+        Provider(
+          create: (context) => ProfilesPanelViewmodel(
+            profilesService: context.read<ProfilesService>(),
           ),
         ),
       ],

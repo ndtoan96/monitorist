@@ -38,6 +38,7 @@ dependencies:
     path: rust_builder
   flutter_rust_bridge: 2.11.1
   provider: ^6.1.5+1
+  path: ^1.9.1
 
 dev_dependencies:
   flutter_test:

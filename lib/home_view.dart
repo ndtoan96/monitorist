@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:monitorist/edit_view.dart';
 import 'package:monitorist/viewmodels/monitors_viewmodel.dart';
 import 'package:monitorist/viewmodels/nightlight_viewmodel.dart';
+import 'package:monitorist/viewmodels/profiles_viewmodel.dart';
 import 'package:provider/provider.dart';
 
 class HomeView extends StatelessWidget {
@@ -42,7 +43,14 @@ class HomeView extends StatelessWidget {
             ),
           ),
           VerticalDivider(),
-          Expanded(flex: 1, child: ProfilesPanel()),
+          Expanded(
+            flex: 1,
+            child: Consumer<ProfilesPanelViewmodel>(
+              builder: (context, viewModel, child) {
+                return ProfilesPanel(viewModel: viewModel);
+              },
+            ),
+          ),
           SizedBox(width: 8),
         ],
       ),
@@ -51,7 +59,9 @@ class HomeView extends StatelessWidget {
 }
 
 class ProfilesPanel extends StatelessWidget {
-  const ProfilesPanel({super.key});
+  final ProfilesPanelViewmodel _viewModel;
+  const ProfilesPanel({super.key, required ProfilesPanelViewmodel viewModel})
+    : _viewModel = viewModel;
 
   @override
   Widget build(BuildContext context) {
@@ -73,23 +83,14 @@ class ProfilesPanel extends StatelessWidget {
         SizedBox(height: 8),
         Expanded(
           child: ListView(
-            children: [
-              ProfileItem(name: "Day profile"),
-              ProfileItem(name: "Night profile"),
-              ProfileItem(name: "Coding profile"),
-              ProfileItem(
-                name: "Another profile with a very looooooooong name",
-              ),
-              ProfileItem(name: "name"),
-              ProfileItem(name: "name"),
-              ProfileItem(name: "name"),
-              ProfileItem(name: "name"),
-              ProfileItem(name: "name"),
-              ProfileItem(name: "name"),
-              ProfileItem(name: "name"),
-              ProfileItem(name: "name"),
-              ProfileItem(name: "name"),
-            ],
+            children: _viewModel.profileNames
+                .map(
+                  (name) => ProfileItem(
+                    name: name,
+                    onDelete: _viewModel.deleteProfile,
+                  ),
+                )
+                .toList(),
           ),
         ),
         SizedBox(
@@ -115,7 +116,8 @@ class ProfilesPanel extends StatelessWidget {
 
 class ProfileItem extends StatelessWidget {
   final String name;
-  const ProfileItem({super.key, required this.name});
+  final void Function(String) onDelete;
+  const ProfileItem({super.key, required this.name, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +169,7 @@ class ProfileItem extends StatelessWidget {
                   ),
                 );
                 if (confirmed == true) {
-                  // Delete the profile
+                  onDelete(name);
                 }
               },
               icon: Icon(
