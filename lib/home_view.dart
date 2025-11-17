@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:monitorist/edit_view.dart';
-import 'package:monitorist/viewmodels/nightlight_panel_viewmodel.dart';
+import 'package:monitorist/viewmodels/monitors_viewmodel.dart';
+import 'package:monitorist/viewmodels/nightlight_viewmodel.dart';
 import 'package:provider/provider.dart';
 
 class HomeView extends StatelessWidget {
@@ -29,7 +30,13 @@ class HomeView extends StatelessWidget {
                     },
                   ),
                   Divider(),
-                  Expanded(child: MonitorsPanel()),
+                  Expanded(
+                    child: Consumer<MonitorsPanelViewmodel>(
+                      builder: (context, viewModel, child) {
+                        return MonitorsPanel(viewModel: viewModel);
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -179,113 +186,72 @@ class ProfileItem extends StatelessWidget {
   }
 }
 
-class MonitorsPanel extends StatelessWidget {
-  const MonitorsPanel({super.key});
+class MonitorsPanel extends StatefulWidget {
+  final MonitorsPanelViewmodel _viewModel;
+  const MonitorsPanel({super.key, required MonitorsPanelViewmodel viewModel})
+    : _viewModel = viewModel;
+
+  @override
+  State<MonitorsPanel> createState() => _MonitorsPanelState();
+}
+
+class _MonitorsPanelState extends State<MonitorsPanel> {
+  List<MonitorItemViewmodel> _monitorViewmodels = [];
+  @override
+  void initState() {
+    super.initState();
+    widget._viewModel.getMonitorItemViewModels().then((value) {
+      setState(() {
+        _monitorViewmodels = value;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final head = Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primaryContainer,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Center(
+        child: const SelectableText(
+          "Monitors",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+        ),
+      ),
+    );
+    final monitorItems = _monitorViewmodels.map((vm) {
+      return ChangeNotifierProvider.value(
+        value: vm,
+        child: Consumer<MonitorItemViewmodel>(
+          builder: (context, vm, child) => MonitorItem(viewModel: vm),
+        ),
+      );
+    }).toList();
+    final body = Expanded(child: ListView(children: monitorItems));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primaryContainer,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Center(
-            child: const SelectableText(
-              "Monitors",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-            ),
-          ),
-        ),
-        SizedBox(height: 8),
-        Expanded(
-          child: ListView(
-            children: [
-              MonitorItem(name: "Monitor 1", initBrightness: 40.0),
-              MonitorItem(
-                name: "A very looooooooong name",
-                initBrightness: 30.0,
-              ),
-              MonitorItem(
-                name: "A very looooooooong name",
-                initBrightness: 30.0,
-              ),
-              MonitorItem(
-                name: "A very looooooooong name",
-                initBrightness: 30.0,
-              ),
-              MonitorItem(
-                name: "A very looooooooong name",
-                initBrightness: 30.0,
-              ),
-              MonitorItem(
-                name: "A very looooooooong name",
-                initBrightness: 30.0,
-              ),
-              MonitorItem(
-                name: "A very looooooooong name",
-                initBrightness: 30.0,
-              ),
-              MonitorItem(
-                name: "A very looooooooong name",
-                initBrightness: 30.0,
-              ),
-              MonitorItem(
-                name: "A very looooooooong name",
-                initBrightness: 30.0,
-              ),
-              MonitorItem(
-                name: "A very looooooooong name",
-                initBrightness: 30.0,
-              ),
-              MonitorItem(
-                name: "A very looooooooong name",
-                initBrightness: 30.0,
-              ),
-              MonitorItem(
-                name: "A very looooooooong name",
-                initBrightness: 30.0,
-              ),
-              MonitorItem(
-                name: "A very looooooooong name",
-                initBrightness: 30.0,
-              ),
-              MonitorItem(
-                name: "A very looooooooong name",
-                initBrightness: 30.0,
-              ),
-            ],
-          ),
-        ),
-      ],
+      children: [head, SizedBox(height: 8), body],
     );
   }
 }
 
 class MonitorItem extends StatefulWidget {
-  final String name;
-  final double initBrightness;
-  final Function(double)? onBrightnessChanged;
+  final MonitorItemViewmodel _viewmodel;
 
-  const MonitorItem({
-    super.key,
-    required this.name,
-    required this.initBrightness,
-    this.onBrightnessChanged,
-  });
+  const MonitorItem({super.key, required MonitorItemViewmodel viewModel})
+    : _viewmodel = viewModel;
 
   @override
   State<MonitorItem> createState() => _MonitorItemState();
 }
 
 class _MonitorItemState extends State<MonitorItem> {
-  late double _brightness;
   @override
   void initState() {
     super.initState();
-    _brightness = widget.initBrightness;
+    widget._viewmodel.loadSettings();
   }
 
   @override
@@ -298,7 +264,7 @@ class _MonitorItemState extends State<MonitorItem> {
           children: [
             Expanded(
               child: SelectableText(
-                widget.name,
+                widget._viewmodel.name,
                 style: TextStyle(fontSize: 18),
               ),
             ),
@@ -307,15 +273,8 @@ class _MonitorItemState extends State<MonitorItem> {
                 SizedBox(
                   width: 300,
                   child: Slider(
-                    value: _brightness,
-                    onChanged: (value) {
-                      if (widget.onBrightnessChanged != null) {
-                        widget.onBrightnessChanged!(value);
-                      }
-                      setState(() {
-                        _brightness = value;
-                      });
-                    },
+                    value: widget._viewmodel.brightness,
+                    onChanged: widget._viewmodel.setBrightness,
                     min: 0.0,
                     max: 100.0,
                     divisions: 100,
@@ -323,7 +282,7 @@ class _MonitorItemState extends State<MonitorItem> {
                   ),
                 ),
                 Text(
-                  "${_brightness.toInt()}",
+                  "${widget._viewmodel.brightness.toInt()}",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
               ],
@@ -336,9 +295,12 @@ class _MonitorItemState extends State<MonitorItem> {
 }
 
 class NightlightPanel extends StatelessWidget {
-  final NightlightPanelViewmodel viewModel;
+  final NightlightPanelViewmodel _viewModel;
 
-  const NightlightPanel({super.key, required this.viewModel});
+  const NightlightPanel({
+    super.key,
+    required NightlightPanelViewmodel viewModel,
+  }) : _viewModel = viewModel;
 
   @override
   Widget build(BuildContext context) {
@@ -356,17 +318,15 @@ class NightlightPanel extends StatelessWidget {
             "Nightlight",
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
           ),
-          viewModel.strength != null
+          _viewModel.strength != null
               ? Row(
                   children: [
                     SizedBox(
                       width: 300,
                       child: Slider(
-                        value: viewModel.strength!,
-                        onChanged: viewModel.isEnabled
-                            ? (double value) {
-                                viewModel.setStrength(value);
-                              }
+                        value: _viewModel.strength!,
+                        onChanged: _viewModel.isEnabled
+                            ? _viewModel.setStrength
                             : null,
                         min: 0.0,
                         max: 100.0,
@@ -375,7 +335,7 @@ class NightlightPanel extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      "${viewModel.strength!.toInt()}",
+                      "${_viewModel.strength!.toInt()}",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
@@ -384,12 +344,7 @@ class NightlightPanel extends StatelessWidget {
                   ],
                 )
               : SizedBox.shrink(),
-          Switch(
-            value: viewModel.isEnabled,
-            onChanged: (bool value) {
-              viewModel.setActive(value);
-            },
-          ),
+          Switch(value: _viewModel.isEnabled, onChanged: _viewModel.setActive),
         ],
       ),
     );

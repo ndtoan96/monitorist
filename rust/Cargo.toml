@@ -7,7 +7,9 @@ edition = "2021"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
+brightness = "0.8.0"
 flutter_rust_bridge = "=2.11.1"
+futures = "0.3.31"
 sem-reg = "0.1.1"
 thiserror = "2.0.17"
 
