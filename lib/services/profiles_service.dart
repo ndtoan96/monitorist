@@ -37,24 +37,30 @@ class ProfilesService {
     _storageFile.writeAsStringSync(content);
   }
 
+  /// Adds a profile to the list.
+  /// 
+  /// @throws [Exception] if the profile name is empty or already exists.
   void addProfile(Profile profile) {
     if (profile.name.isEmpty) {
-      throw Exception('Profile name cannot be empty.');
+      throw ProfileException('Profile name cannot be empty.');
     }
     if (_profiles.any((p) => p.name == profile.name)) {
-      throw Exception('Profile with name ${profile.name} already exists.');
+      throw ProfileException('Profile with name ${profile.name} already exists.');
     }
     _profiles.add(profile);
     _save();
   }
 
+  /// Updates an existing profile.
+  /// 
+  /// @throws [Exception] if the new profile name is empty or already exists.
   void updateProfile({required String name, required Profile newProfile}) {
     if (newProfile.name.isEmpty) {
-      throw Exception('Profile name cannot be empty.');
+      throw ProfileException('Profile name cannot be empty.');
     }
     if (newProfile.name != name &&
         _profiles.any((p) => p.name == newProfile.name)) {
-      throw Exception('Profile with name ${newProfile.name} already exists.');
+      throw ProfileException('Profile with name ${newProfile.name} already exists.');
     }
     final index = _profiles.indexWhere((p) => p.name == name);
     if (index != -1) {
@@ -71,4 +77,12 @@ class ProfilesService {
   Profile getProfile(String name) {
     return _profiles.firstWhere((p) => p.name == name);
   }
+}
+
+class ProfileException implements Exception {
+  final String message;
+  ProfileException(this.message);
+
+  @override
+  String toString() => 'ProfileException: $message';
 }

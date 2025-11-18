@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monitorist/services/profiles_service.dart';
 import 'package:monitorist/viewmodels/editprofile_viewmodel.dart';
 import 'package:provider/provider.dart';
 
@@ -81,8 +82,20 @@ class _EditViewState extends State<EditView> {
           FloatingActionButton(
             heroTag: "saveBtn",
             onPressed: () {
-              viewModel.saveProfile();
-              viewModel.restoreBaseline();
+              try {
+                viewModel.saveProfile();
+                viewModel.restoreBaseline();
+              } on ProfileException catch (e) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(e.message)));
+                return;
+              } catch (e) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(e.toString())));
+                return;
+              }
               Navigator.of(context).pop();
             },
             child: Icon(Icons.save),
