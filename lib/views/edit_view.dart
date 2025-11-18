@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:monitorist/viewmodels/edit_profile_viewmodel.dart';
+import 'package:monitorist/viewmodels/editprofile_viewmodel.dart';
 import 'package:provider/provider.dart';
 
 class EditView extends StatefulWidget {
-  final EditProfileViewmodel _viewmodel;
-
-  const EditView({super.key, required EditProfileViewmodel viewmodel})
-    : _viewmodel = viewmodel;
+  final String name;
+  const EditView({super.key, required this.name});
 
   @override
   State<EditView> createState() => _EditViewState();
@@ -18,7 +16,7 @@ class _EditViewState extends State<EditView> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget._viewmodel.name);
+    _nameController = TextEditingController(text: widget.name);
   }
 
   @override
@@ -29,11 +27,10 @@ class _EditViewState extends State<EditView> {
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<EditProfileViewModel>();
     return Scaffold(
       appBar: AppBar(
-        title: widget._viewmodel.isNew
-            ? Text("New Profile")
-            : Text("Edit Profile"),
+        title: viewModel.isNew ? Text("New Profile") : Text("Edit Profile"),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
       ),
@@ -47,36 +44,30 @@ class _EditViewState extends State<EditView> {
                   controller: _nameController,
                   decoration: InputDecoration(border: OutlineInputBorder()),
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  onChanged: widget._viewmodel.setName,
+                  onChanged: viewModel.setName,
                 ),
               ),
               Checkbox(
-                value: widget._viewmodel.preview,
+                value: viewModel.preview,
                 onChanged: (bool? value) {
-                  widget._viewmodel.setPreview(value ?? true);
+                  viewModel.setPreview(value ?? true);
                 },
               ),
               const Text("Preview"),
             ],
           ),
           ChangeNotifierProvider.value(
-            value: widget._viewmodel.nightlightCardViewmodel,
-            child: Consumer<NightlightCardViewmodel>(
-              builder: (context, viewmodel, child) =>
-                  NightlightCard(viewmodel: viewmodel),
-            ),
+            value: viewModel.editProfileNightlightViewModel,
+            child: NightlightCard(),
           ),
           Divider(),
           Expanded(
             child: ListView(
-              children: widget._viewmodel.monitorCardViewmodels
+              children: viewModel.editProfileMonitorViewModels
                   .map(
                     (vm) => ChangeNotifierProvider.value(
                       value: vm,
-                      child: Consumer<MonitorCardViewmodel>(
-                        builder: (context, viewmodel, child) =>
-                            MonitorCard(viewmodel: viewmodel),
-                      ),
+                      child: MonitorCard(),
                     ),
                   )
                   .toList(),
@@ -90,7 +81,8 @@ class _EditViewState extends State<EditView> {
           FloatingActionButton(
             heroTag: "saveBtn",
             onPressed: () {
-              widget._viewmodel.saveProfile();
+              viewModel.saveProfile();
+              viewModel.restoreBaseline();
               Navigator.of(context).pop();
             },
             child: Icon(Icons.save),
@@ -120,6 +112,7 @@ class _EditViewState extends State<EditView> {
                 ),
               );
               if (confirmed == true && context.mounted) {
+                viewModel.restoreBaseline();
                 Navigator.of(context).pop();
               }
             },
@@ -132,16 +125,14 @@ class _EditViewState extends State<EditView> {
 }
 
 class MonitorCard extends StatelessWidget {
-  final MonitorCardViewmodel _viewmodel;
-
-  const MonitorCard({super.key, required MonitorCardViewmodel viewmodel})
-    : _viewmodel = viewmodel;
+  const MonitorCard({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<EditProfileMonitorViewModel>();
     final card = Card(
       child: Container(
-        decoration: _viewmodel.exists
+        decoration: viewModel.exists
             ? null
             : BoxDecoration(
                 border: Border.all(color: Theme.of(context).colorScheme.error),
@@ -155,25 +146,25 @@ class MonitorCard extends StatelessWidget {
               Tooltip(
                 message: "Include this monitor in the profile",
                 child: Checkbox(
-                  value: _viewmodel.isIncluded,
-                  onChanged: _viewmodel.exists
+                  value: viewModel.isIncluded,
+                  onChanged: viewModel.exists
                       ? (bool? value) {
-                          _viewmodel.setIncluded(value ?? true);
+                          viewModel.setIncluded(value ?? true);
                         }
                       : null,
                 ),
               ),
-              Text(_viewmodel.name),
+              Text(viewModel.name),
               Slider(
-                value: _viewmodel.brightness,
-                onChanged: _viewmodel.exists ? _viewmodel.setBrightness : null,
+                value: viewModel.brightness,
+                onChanged: viewModel.exists ? viewModel.setBrightness : null,
                 min: 0,
                 max: 100,
                 divisions: 100,
               ),
-              Text(_viewmodel.brightness.toInt().toString()),
+              Text(viewModel.brightness.toInt().toString()),
               Spacer(),
-              _viewmodel.exists
+              viewModel.exists
                   ? SizedBox.shrink()
                   : IconButton(
                       onPressed: () {},
@@ -185,7 +176,7 @@ class MonitorCard extends StatelessWidget {
         ),
       ),
     );
-    if (_viewmodel.exists) {
+    if (viewModel.exists) {
       return card;
     } else {
       return Tooltip(message: "This monitor does not exist", child: card);
@@ -194,9 +185,7 @@ class MonitorCard extends StatelessWidget {
 }
 
 class NightlightCard extends StatefulWidget {
-  final NightlightCardViewmodel _viewmodel;
-  const NightlightCard({super.key, required NightlightCardViewmodel viewmodel})
-    : _viewmodel = viewmodel;
+  const NightlightCard({super.key});
 
   @override
   State<NightlightCard> createState() => _NightlightCardState();
@@ -205,6 +194,7 @@ class NightlightCard extends StatefulWidget {
 class _NightlightCardState extends State<NightlightCard> {
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<EditProfileNightlightViewModel>();
     return Card(
       child: Padding(
         padding: EdgeInsets.all(8),
@@ -213,31 +203,28 @@ class _NightlightCardState extends State<NightlightCard> {
             Tooltip(
               message: "Include nightlight setting in the profile",
               child: Checkbox(
-                value: widget._viewmodel.isIncluded,
+                value: viewModel.isIncluded,
                 onChanged: (bool? value) {
-                  widget._viewmodel.setIncluded(value ?? true);
+                  viewModel.setIncluded(value ?? true);
                 },
               ),
             ),
             Text("Nightlight"),
-            widget._viewmodel.strength != null
+            viewModel.strength != null
                 ? Slider(
-                    value: widget._viewmodel.strength!,
-                    onChanged: widget._viewmodel.isEnabled
-                        ? widget._viewmodel.setStrength
+                    value: viewModel.strength!,
+                    onChanged: viewModel.isEnabled
+                        ? viewModel.setStrength
                         : null,
                     min: 0,
                     max: 100,
                     divisions: 100,
                   )
                 : SizedBox.shrink(),
-            widget._viewmodel.strength != null
-                ? Text(widget._viewmodel.strength!.toInt().toString())
+            viewModel.strength != null
+                ? Text(viewModel.strength!.toInt().toString())
                 : SizedBox.shrink(),
-            Switch(
-              value: widget._viewmodel.isEnabled,
-              onChanged: widget._viewmodel.setEnabled,
-            ),
+            Switch(value: viewModel.isEnabled, onChanged: viewModel.setEnabled),
           ],
         ),
       ),

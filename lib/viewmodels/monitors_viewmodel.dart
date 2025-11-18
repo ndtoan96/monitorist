@@ -1,36 +1,49 @@
+import 'dart:collection';
+
 import 'package:flutter/foundation.dart';
 import 'package:monitorist/services/monitors_service.dart';
 import 'package:monitorist/src/rust/api/monitors.dart';
 
-class MonitorsPanelViewmodel {
+class MonitorsViewModel extends ChangeNotifier {
   final MonitorsService _monitorsService;
-  MonitorsPanelViewmodel({required MonitorsService monitorsService})
-    : _monitorsService = monitorsService;
+  final List<MonitorViewModel> _monitorViewModels = [];
+  MonitorsViewModel({required MonitorsService monitorsService})
+    : _monitorsService = monitorsService {
+    _loadMonitors();
+  }
 
-  Future<List<MonitorItemViewmodel>> getMonitorItemViewModels() async {
+  UnmodifiableListView<MonitorViewModel> get monitorViewModels =>
+      UnmodifiableListView(_monitorViewModels);
+
+  Future<void> _loadMonitors() async {
     final monitorResults = await _monitorsService.getMonitors();
-    List<MonitorItemViewmodel> monitorViewmodels = [];
+    _monitorViewModels.clear();
     for (final result in monitorResults) {
       if (result.success != null) {
-        monitorViewmodels.add(MonitorItemViewmodel(monitor: result.success!));
+        _monitorViewModels.add(MonitorViewModel(monitor: result.success!));
       } else {
         // Handle error case if needed
       }
     }
-    return monitorViewmodels;
+    notifyListeners();
   }
 }
 
-class MonitorItemViewmodel extends ChangeNotifier {
+class MonitorViewModel extends ChangeNotifier {
   final Monitor _monitor;
+  String _id = "";
   String _name = "";
   double _brightness = 0.0;
-  MonitorItemViewmodel({required Monitor monitor}) : _monitor = monitor;
+  MonitorViewModel({required Monitor monitor}) : _monitor = monitor {
+    loadSettings();
+  }
 
+  String get id => _id;
   String get name => _name;
   double get brightness => _brightness;
 
   Future<void> loadSettings() async {
+    _id = await _monitor.deviceName();
     _name = await _monitor.displayName();
     final brightnessValue = await _monitor.getBrightness();
     _brightness = brightnessValue.toDouble();

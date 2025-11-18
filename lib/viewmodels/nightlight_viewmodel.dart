@@ -1,19 +1,19 @@
 import 'package:flutter/foundation.dart';
 import 'package:monitorist/services/nightlight_service.dart';
 
-class NightlightPanelViewmodel extends ChangeNotifier {
+class NightlightViewModel extends ChangeNotifier {
   final NightlightService _nightlightService;
   double? _strength;
   bool _isEnabled = false;
 
-  NightlightPanelViewmodel({required NightlightService nightlightService}) : _nightlightService = nightlightService {
-    loadSettings();
+  NightlightViewModel({required NightlightService nightlightService}) : _nightlightService = nightlightService {
+    _loadSettings();
   }
 
   double? get strength => _strength;
   bool get isEnabled => _isEnabled;
 
-  void loadSettings() {
+  void _loadSettings() {
     final (strength, isEnabled) = _nightlightService.loadSettings();
     _strength = strength;
     _isEnabled = isEnabled;

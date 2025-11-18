@@ -1,10 +1,21 @@
+import 'package:monitorist/models/profile.dart';
 import 'package:monitorist/services/profiles_service.dart';
 import 'package:flutter/foundation.dart';
+import 'package:monitorist/viewmodels/monitors_viewmodel.dart';
+import 'package:monitorist/viewmodels/nightlight_viewmodel.dart';
 
-class ProfilesViewmodel extends ChangeNotifier {
+class ProfilesViewModel extends ChangeNotifier {
   final ProfilesService _profilesService;
-  ProfilesViewmodel({required ProfilesService profilesService})
-    : _profilesService = profilesService;
+  final NightlightViewModel _nightlightViewModel;
+  final MonitorsViewModel _monitorsViewModel;
+
+  ProfilesViewModel({
+    required ProfilesService profilesService,
+    required NightlightViewModel nightlightViewModel,
+    required MonitorsViewModel monitorsViewModel,
+  }) : _profilesService = profilesService,
+       _nightlightViewModel = nightlightViewModel,
+       _monitorsViewModel = monitorsViewModel;
 
   List<Profile> get profiles => _profilesService.profiles;
 
@@ -21,5 +32,24 @@ class ProfilesViewmodel extends ChangeNotifier {
   void updateProfile({required String name, required Profile newProfile}) {
     _profilesService.updateProfile(name: name, newProfile: newProfile);
     notifyListeners();
+  }
+
+  void applyProfile(String name) {
+    final profile = _profilesService.getProfile(name);
+    if (profile.nightlightProfile != null) {
+      _nightlightViewModel.setActive(profile.nightlightProfile!.isEnabled);
+      if (profile.nightlightProfile!.strength != null) {
+        _nightlightViewModel.setStrength(profile.nightlightProfile!.strength!);
+      }
+    }
+    for (final monitor in _monitorsViewModel.monitorViewModels) {
+      final index = profile.monitorsProfile.indexWhere(
+        (p) => p.id == monitor.id,
+      );
+      if (index != -1) {
+        final monitorProfile = profile.monitorsProfile[index];
+        monitor.setBrightness(monitorProfile.brightness);
+      }
+    }
   }
 }

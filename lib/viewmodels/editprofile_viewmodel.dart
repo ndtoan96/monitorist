@@ -1,66 +1,56 @@
 import 'package:flutter/foundation.dart';
-import 'package:monitorist/services/monitors_service.dart';
-import 'package:monitorist/services/nightlight_service.dart';
-import 'package:monitorist/services/profiles_service.dart';
-import 'package:monitorist/src/rust/api/monitors.dart';
+import 'package:monitorist/models/profile.dart';
+import 'package:monitorist/viewmodels/monitors_viewmodel.dart';
+import 'package:monitorist/viewmodels/nightlight_viewmodel.dart';
 import 'package:monitorist/viewmodels/profiles_viewmodel.dart';
 
-class EditProfileViewmodel extends ChangeNotifier {
+class EditProfileViewModel extends ChangeNotifier {
   final bool _isNew;
   final String _oldName;
   String _name;
   bool _preview;
-  late final NightlightCardViewmodel nightlightCardViewmodel;
-  final List<MonitorCardViewmodel> monitorCardViewmodels = [];
-  final NightlightService _nightlightService;
-  final MonitorsService _monitorsService;
-  final ProfilesViewmodel _profilesViewmodel;
+  late final EditProfileNightlightViewModel editProfileNightlightViewModel;
+  final List<EditProfileMonitorViewModel> editProfileMonitorViewModels = [];
+  final NightlightViewModel _nightlightViewModel;
+  final MonitorsViewModel _monitorsViewModel;
+  final ProfilesViewModel _profilesViewmodel;
 
-  EditProfileViewmodel.newProfile({
-    required NightlightService nightlightService,
-    required MonitorsService monitorsService,
-    required ProfilesViewmodel profilesViewmodel,
+  EditProfileViewModel.newProfile({
+    required NightlightViewModel nightlightViewModel,
+    required MonitorsViewModel monitorsViewModel,
+    required ProfilesViewModel profilesViewmodel,
   }) : _isNew = true,
        _oldName = "New Profile",
        _name = "New Profile",
        _preview = true,
-       _nightlightService = nightlightService,
-       _monitorsService = monitorsService,
+       _nightlightViewModel = nightlightViewModel,
+       _monitorsViewModel = monitorsViewModel,
        _profilesViewmodel = profilesViewmodel {
-    final (strength, isEnabled) = _nightlightService.loadSettings();
-    nightlightCardViewmodel = NightlightCardViewmodel(
-      isEnabled: isEnabled,
-      baselineIsEnabled: isEnabled,
-      strength: strength,
-      baselineStrength: strength,
+    editProfileNightlightViewModel = EditProfileNightlightViewModel(
+      isEnabled: _nightlightViewModel.isEnabled,
+      baselineIsEnabled: _nightlightViewModel.isEnabled,
+      strength: _nightlightViewModel.strength,
+      baselineStrength: _nightlightViewModel.strength,
       isIncluded: true,
       parent: this,
-      nightlightService: _nightlightService,
+      nightlightViewModel: _nightlightViewModel,
     );
-    loadMonitors();
+    _loadMonitorsForNewProfile();
   }
 
-  Future<void> loadMonitors() async {
-    final results = await _monitorsService.getMonitors();
-    for (final result in results) {
-      if (result.success != null) {
-        final monitor = result.success!;
-        final brightness = await monitor.getBrightness().then(
-          (value) => value.toDouble(),
-        );
-        monitorCardViewmodels.add(
-          MonitorCardViewmodel(
-            id: await monitor.deviceName(),
-            name: await monitor.displayName(),
-            brightness: brightness,
-            baselineBrightness: brightness,
-            isIncluded: true,
-            exists: true,
-            parent: this,
-            monitor: monitor,
-          ),
-        );
-      }
+  void _loadMonitorsForNewProfile() {
+    for (final monitorViewModel in _monitorsViewModel.monitorViewModels) {
+      editProfileMonitorViewModels.add(
+        EditProfileMonitorViewModel(
+          id: monitorViewModel.id,
+          name: monitorViewModel.name,
+          baselineBrightness: monitorViewModel.brightness,
+          isIncluded: true,
+          exists: true,
+          parent: this,
+          monitorViewModel: monitorViewModel,
+        ),
+      );
     }
     notifyListeners();
   }
@@ -71,8 +61,8 @@ class EditProfileViewmodel extends ChangeNotifier {
 
   void setPreview(bool preview) {
     _preview = preview;
-    nightlightCardViewmodel.onPreviewChange();
-    for (var monitorCard in monitorCardViewmodels) {
+    editProfileNightlightViewModel.onPreviewChange();
+    for (var monitorCard in editProfileMonitorViewModels) {
       monitorCard.onPreviewChange();
     }
     notifyListeners();
@@ -84,20 +74,20 @@ class EditProfileViewmodel extends ChangeNotifier {
   }
 
   void restoreBaseline() {
-    nightlightCardViewmodel.restoreBaseline();
-    for (var monitorCard in monitorCardViewmodels) {
+    editProfileNightlightViewModel.restoreBaseline();
+    for (var monitorCard in editProfileMonitorViewModels) {
       monitorCard.restoreBaseline();
     }
   }
 
   void saveProfile() {
-    final nightlightProfile = nightlightCardViewmodel.isIncluded
+    final nightlightProfile = editProfileNightlightViewModel.isIncluded
         ? NightlightProfile(
-            isEnabled: nightlightCardViewmodel.isEnabled,
-            strength: nightlightCardViewmodel.strength,
+            isEnabled: editProfileNightlightViewModel.isEnabled,
+            strength: editProfileNightlightViewModel.strength,
           )
         : null;
-    final monitorsProfile = monitorCardViewmodels
+    final monitorsProfile = editProfileMonitorViewModels
         .where((vm) => vm.isIncluded)
         .map((vm) => MonitorProfile(id: vm.id, brightness: vm.brightness))
         .toList();
@@ -111,34 +101,33 @@ class EditProfileViewmodel extends ChangeNotifier {
     } else {
       _profilesViewmodel.updateProfile(name: _oldName, newProfile: profile);
     }
-    restoreBaseline();
   }
 }
 
-class NightlightCardViewmodel extends ChangeNotifier {
+class EditProfileNightlightViewModel extends ChangeNotifier {
   bool _isEnabled;
   final bool _baselineIsEnabled;
   double? _strength;
   final double? _baselineStrength;
   bool _isIncluded;
-  final NightlightService _nightlightService;
-  final EditProfileViewmodel _parent;
+  final NightlightViewModel _nightlightViewModel;
+  final EditProfileViewModel _parent;
 
-  NightlightCardViewmodel({
+  EditProfileNightlightViewModel({
     required bool isEnabled,
     required bool baselineIsEnabled,
     required double? strength,
     required double? baselineStrength,
     required bool isIncluded,
-    required EditProfileViewmodel parent,
-    required NightlightService nightlightService,
+    required EditProfileViewModel parent,
+    required NightlightViewModel nightlightViewModel,
   }) : _isEnabled = isEnabled,
        _baselineIsEnabled = baselineIsEnabled,
        _strength = strength,
        _baselineStrength = baselineStrength,
        _isIncluded = isIncluded,
        _parent = parent,
-       _nightlightService = nightlightService;
+       _nightlightViewModel = nightlightViewModel;
 
   bool get isEnabled => _isEnabled;
   double? get strength => _strength;
@@ -152,7 +141,7 @@ class NightlightCardViewmodel extends ChangeNotifier {
   void setEnabled(bool enabled) {
     _isEnabled = enabled;
     if (_parent.preview) {
-      _nightlightService.setActive(enabled);
+      _nightlightViewModel.setActive(enabled);
     }
     notifyListeners();
   }
@@ -160,16 +149,16 @@ class NightlightCardViewmodel extends ChangeNotifier {
   void setStrength(double strength) {
     _strength = strength;
     if (_parent.preview) {
-      _nightlightService.setStrength(strength);
+      _nightlightViewModel.setStrength(strength);
     }
     notifyListeners();
   }
 
   void onPreviewChange() {
     if (_parent.preview) {
-      _nightlightService.setActive(_isEnabled);
+      _nightlightViewModel.setActive(_isEnabled);
       if (_strength != null) {
-        _nightlightService.setStrength(_strength!);
+        _nightlightViewModel.setStrength(_strength!);
       }
     } else {
       restoreBaseline();
@@ -177,37 +166,36 @@ class NightlightCardViewmodel extends ChangeNotifier {
   }
 
   void restoreBaseline() {
-    _nightlightService.setActive(_baselineIsEnabled);
+    _nightlightViewModel.setActive(_baselineIsEnabled);
     if (_baselineStrength != null) {
-      _nightlightService.setStrength(_baselineStrength);
+      _nightlightViewModel.setStrength(_baselineStrength);
     }
   }
 }
 
-class MonitorCardViewmodel extends ChangeNotifier {
+class EditProfileMonitorViewModel extends ChangeNotifier {
   final String id;
   final String name;
   final bool exists;
   double _brightness;
   final double _baselineBrightness;
   bool _isIncluded;
-  final EditProfileViewmodel _parent;
-  final Monitor? _monitor;
+  final EditProfileViewModel _parent;
+  final MonitorViewModel? _monitorViewModel;
 
-  MonitorCardViewmodel({
+  EditProfileMonitorViewModel({
     required this.id,
     required this.name,
-    required double brightness,
     required double baselineBrightness,
     required bool isIncluded,
     required this.exists,
-    required EditProfileViewmodel parent,
-    Monitor? monitor,
-  }) : _brightness = brightness,
+    required EditProfileViewModel parent,
+    MonitorViewModel? monitorViewModel,
+  }) : _brightness = monitorViewModel?.brightness ?? 0,
        _baselineBrightness = baselineBrightness,
        _isIncluded = isIncluded,
        _parent = parent,
-       _monitor = monitor;
+       _monitorViewModel = monitorViewModel;
 
   double get brightness => _brightness;
   bool get isIncluded => _isIncluded;
@@ -220,20 +208,20 @@ class MonitorCardViewmodel extends ChangeNotifier {
   void setBrightness(double brightness) {
     _brightness = brightness;
     if (_parent.preview) {
-      _monitor?.setBrightness(value: brightness.toInt());
+      _monitorViewModel?.setBrightness(brightness);
     }
     notifyListeners();
   }
 
   void onPreviewChange() {
     if (_parent.preview) {
-      _monitor?.setBrightness(value: _brightness.toInt());
+      _monitorViewModel?.setBrightness(_brightness);
     } else {
       restoreBaseline();
     }
   }
 
   void restoreBaseline() {
-    _monitor?.setBrightness(value: _baselineBrightness.toInt());
+    _monitorViewModel?.setBrightness(_baselineBrightness);
   }
 }

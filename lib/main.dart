@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:monitorist/home_view.dart';
+import 'package:monitorist/views/home_view.dart';
 import 'package:monitorist/services/monitors_service.dart';
 import 'package:monitorist/services/nightlight_service.dart';
 import 'package:monitorist/services/profiles_service.dart';
@@ -18,18 +18,20 @@ Future<void> main() async {
         Provider(create: (_) => MonitorsService()),
         Provider(create: (_) => ProfilesService()),
         ChangeNotifierProvider(
-          create: (context) => NightlightPanelViewmodel(
+          create: (context) => NightlightViewModel(
             nightlightService: context.read<NightlightService>(),
           ),
         ),
-        Provider(
-          create: (context) => MonitorsPanelViewmodel(
+        ChangeNotifierProvider(
+          create: (context) => MonitorsViewModel(
             monitorsService: context.read<MonitorsService>(),
           ),
         ),
         ChangeNotifierProvider(
-          create: (context) => ProfilesViewmodel(
+          create: (context) => ProfilesViewModel(
             profilesService: context.read<ProfilesService>(),
+            nightlightViewModel: context.read<NightlightViewModel>(),
+            monitorsViewModel: context.read<MonitorsViewModel>(),
           ),
         ),
       ],
