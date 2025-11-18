@@ -101,15 +101,27 @@ class ProfileItem extends StatelessWidget {
             TextButton.icon(
               onPressed: () => onSet(name),
               icon: Icon(Icons.check),
-              label: Text("Set"),
+              label: Text("Apply"),
             ),
             TextButton.icon(
-              onPressed: () {},
-              // => Navigator.of(context).push(
-              //   MaterialPageRoute(
-              //     builder: (context) => EditView.editProfile(name: name),
-              //   ),
-              // ),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    final editProfileViewmodel =
+                        EditProfileViewModel.editProfile(
+                          name: name,
+                          nightlightViewModel: context
+                              .read<NightlightViewModel>(),
+                          monitorsViewModel: context.read<MonitorsViewModel>(),
+                          profilesViewmodel: context.read<ProfilesViewModel>(),
+                        );
+                    return ChangeNotifierProvider.value(
+                      value: editProfileViewmodel,
+                      child: EditView(name: name),
+                    );
+                  },
+                ),
+              ),
               icon: Icon(Icons.edit),
               label: Text("Edit"),
             ),

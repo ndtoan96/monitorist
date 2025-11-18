@@ -38,6 +38,41 @@ class EditProfileViewModel extends ChangeNotifier {
     _loadMonitorsForNewProfile();
   }
 
+  EditProfileViewModel.editProfile({
+    required name,
+    required NightlightViewModel nightlightViewModel,
+    required MonitorsViewModel monitorsViewModel,
+    required ProfilesViewModel profilesViewmodel,
+  }) : _isNew = false,
+       _oldName = name,
+       _name = name,
+       _preview = true,
+       _nightlightViewModel = nightlightViewModel,
+       _monitorsViewModel = monitorsViewModel,
+       _profilesViewmodel = profilesViewmodel {
+    final profile = _profilesViewmodel.getProfile(name);
+    editProfileNightlightViewModel = profile.nightlightProfile != null
+        ? EditProfileNightlightViewModel(
+            isEnabled: profile.nightlightProfile!.isEnabled,
+            baselineIsEnabled: _nightlightViewModel.isEnabled,
+            strength: profile.nightlightProfile!.strength,
+            baselineStrength: _nightlightViewModel.strength,
+            isIncluded: true,
+            parent: this,
+            nightlightViewModel: _nightlightViewModel,
+          )
+        : EditProfileNightlightViewModel(
+            isEnabled: _nightlightViewModel.isEnabled,
+            baselineIsEnabled: _nightlightViewModel.isEnabled,
+            strength: _nightlightViewModel.strength,
+            baselineStrength: _nightlightViewModel.strength,
+            isIncluded: false,
+            parent: this,
+            nightlightViewModel: _nightlightViewModel,
+          );
+    _loadMonitors(profile.monitorsProfile);
+  }
+
   void _loadMonitorsForNewProfile() {
     for (final monitorViewModel in _monitorsViewModel.monitorViewModels) {
       editProfileMonitorViewModels.add(
@@ -51,6 +86,58 @@ class EditProfileViewModel extends ChangeNotifier {
           monitorViewModel: monitorViewModel,
         ),
       );
+    }
+    notifyListeners();
+  }
+
+  void _loadMonitors(List<MonitorProfile> monitorsProfile) {
+    for (final monitorViewModel in _monitorsViewModel.monitorViewModels) {
+      final index = monitorsProfile.indexWhere(
+        (mp) => mp.id == monitorViewModel.id,
+      );
+      if (index != -1) {
+        final monitorProfile = monitorsProfile[index];
+        editProfileMonitorViewModels.add(
+          EditProfileMonitorViewModel(
+            id: monitorViewModel.id,
+            name: monitorViewModel.name,
+            baselineBrightness: monitorViewModel.brightness,
+            isIncluded: true,
+            exists: true,
+            parent: this,
+            monitorViewModel: monitorViewModel,
+          )..setBrightness(monitorProfile.brightness),
+        );
+      } else {
+        editProfileMonitorViewModels.add(
+          EditProfileMonitorViewModel(
+            id: monitorViewModel.id,
+            name: monitorViewModel.name,
+            baselineBrightness: monitorViewModel.brightness,
+            isIncluded: false,
+            exists: true,
+            parent: this,
+            monitorViewModel: monitorViewModel,
+          ),
+        );
+      }
+    }
+    final existingIds = _monitorsViewModel.monitorViewModels
+        .map((mp) => mp.id)
+        .toSet();
+    for (final monitorProfile in monitorsProfile) {
+      if (!existingIds.contains(monitorProfile.id)) {
+        editProfileMonitorViewModels.add(
+          EditProfileMonitorViewModel(
+            id: monitorProfile.id,
+            name: monitorProfile.id,
+            baselineBrightness: monitorProfile.brightness,
+            isIncluded: true,
+            exists: false,
+            parent: this,
+          ),
+        );
+      }
     }
     notifyListeners();
   }

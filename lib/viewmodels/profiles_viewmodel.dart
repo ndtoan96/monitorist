@@ -19,6 +19,10 @@ class ProfilesViewModel extends ChangeNotifier {
 
   List<Profile> get profiles => _profilesService.profiles;
 
+  Profile getProfile(String name) {
+    return _profilesService.getProfile(name);
+  }
+
   void addProfile(Profile profile) {
     _profilesService.addProfile(profile);
     notifyListeners();
