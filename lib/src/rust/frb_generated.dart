@@ -65,7 +65,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => 489658375;
+  int get rustContentHash => 866002109;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -76,13 +76,13 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
-  Future<String> crateApiMonitorsMonitorDeviceDescription({
-    required Monitor that,
-  });
+  String crateApiMonitorsMonitorDeviceDescription({required Monitor that});
 
   Future<String> crateApiMonitorsMonitorDeviceName({required Monitor that});
 
-  Future<String> crateApiMonitorsMonitorDevicePath({required Monitor that});
+  String crateApiMonitorsMonitorDevicePath({required Monitor that});
+
+  String crateApiMonitorsMonitorDeviceRegistryKey({required Monitor that});
 
   Future<String> crateApiMonitorsMonitorDisplayName({required Monitor that});
 
@@ -121,23 +121,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
-  Future<String> crateApiMonitorsMonitorDeviceDescription({
-    required Monitor that,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
+  String crateApiMonitorsMonitorDeviceDescription({required Monitor that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMonitor(
             that,
             serializer,
           );
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 1,
-            port: port_,
-          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 1)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -188,21 +181,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "Monitor_device_name", argNames: ["that"]);
 
   @override
-  Future<String> crateApiMonitorsMonitorDevicePath({required Monitor that}) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
+  String crateApiMonitorsMonitorDevicePath({required Monitor that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMonitor(
             that,
             serializer,
           );
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 3,
-            port: port_,
-          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -219,6 +207,35 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "Monitor_device_path", argNames: ["that"]);
 
   @override
+  String crateApiMonitorsMonitorDeviceRegistryKey({required Monitor that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMonitor(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_String,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+        constMeta: kCrateApiMonitorsMonitorDeviceRegistryKeyConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiMonitorsMonitorDeviceRegistryKeyConstMeta =>
+      const TaskConstMeta(
+        debugName: "Monitor_device_registry_key",
+        argNames: ["that"],
+      );
+
+  @override
   Future<String> crateApiMonitorsMonitorDisplayName({required Monitor that}) {
     return handler.executeNormal(
       NormalTask(
@@ -231,7 +248,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 4,
+            funcId: 5,
             port: port_,
           );
         },
@@ -267,7 +284,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 5,
+            funcId: 6,
             port: port_,
           );
         },
@@ -301,7 +318,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 6,
+            funcId: 7,
             port: port_,
           );
         },
@@ -331,7 +348,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 7,
+            funcId: 8,
             port: port_,
           );
         },
@@ -366,7 +383,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 8,
+            funcId: 9,
             port: port_,
           );
         },
@@ -393,7 +410,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_record_opt_box_autoadd_f_32_bool,
@@ -416,7 +433,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_bool(isActive, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -439,7 +456,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_f_32(strength, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1052,14 +1069,17 @@ class MonitorImpl extends RustOpaque implements Monitor {
         RustLib.instance.api.rust_arc_decrement_strong_count_MonitorPtr,
   );
 
-  Future<String> deviceDescription() =>
+  String deviceDescription() =>
       RustLib.instance.api.crateApiMonitorsMonitorDeviceDescription(that: this);
 
   Future<String> deviceName() =>
       RustLib.instance.api.crateApiMonitorsMonitorDeviceName(that: this);
 
-  Future<String> devicePath() =>
+  String devicePath() =>
       RustLib.instance.api.crateApiMonitorsMonitorDevicePath(that: this);
+
+  String deviceRegistryKey() =>
+      RustLib.instance.api.crateApiMonitorsMonitorDeviceRegistryKey(that: this);
 
   Future<String> displayName() =>
       RustLib.instance.api.crateApiMonitorsMonitorDisplayName(that: this);

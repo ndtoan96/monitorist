@@ -8,11 +8,13 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Monitor>>
 abstract class Monitor implements RustOpaqueInterface {
-  Future<String> deviceDescription();
+  String deviceDescription();
 
   Future<String> deviceName();
 
-  Future<String> devicePath();
+  String devicePath();
+
+  String deviceRegistryKey();
 
   Future<String> displayName();
 

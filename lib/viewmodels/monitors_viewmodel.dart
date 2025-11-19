@@ -29,19 +29,18 @@ class MonitorsViewModel extends ChangeNotifier {
 
 class MonitorViewModel extends ChangeNotifier {
   final Monitor _monitor;
-  String _id = "";
+  final String _id;
   String _name = "";
   double _brightness = 0.0;
   double? _brightnessToSet;
   bool _setBrightnessRunning = false;
-  MonitorViewModel({required Monitor monitor}) : _monitor = monitor;
+  MonitorViewModel({required Monitor monitor}) : _monitor = monitor, _id = monitor.devicePath();
 
   String get id => _id;
   String get name => _name;
   double get brightness => _brightness;
 
   Future<void> loadSettings() async {
-    _id = await _monitor.deviceName();
     _name = await _monitor.displayName();
     final brightnessValue = await _monitor.getBrightness();
     _brightness = brightnessValue.toDouble();

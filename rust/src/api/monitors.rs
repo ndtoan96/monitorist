@@ -47,12 +47,19 @@ impl Monitor {
         Ok(self.0.friendly_device_name().await?)
     }
 
+    #[flutter_rust_bridge::frb(sync)]
     pub fn device_description(&self) -> Result<String, brightness::Error> {
         Ok(self.0.device_description()?)
     }
 
+    #[flutter_rust_bridge::frb(sync)]
     pub fn device_path(&self) -> Result<String, brightness::Error> {
         Ok(self.0.device_path()?)
+    }
+
+    #[flutter_rust_bridge::frb(sync)]
+    pub fn device_registry_key(&self) -> Result<String, brightness::Error> {
+        Ok(self.0.device_registry_key()?)
     }
 
     pub async fn get_brightness(&self) -> Result<u32, brightness::Error> {
