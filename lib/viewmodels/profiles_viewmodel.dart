@@ -47,11 +47,8 @@ class ProfilesViewModel extends ChangeNotifier {
       }
     }
     for (final monitor in _monitorsViewModel.monitorViewModels) {
-      final index = profile.monitorsProfile.indexWhere(
-        (p) => p.id == monitor.id,
-      );
-      if (index != -1) {
-        final monitorProfile = profile.monitorsProfile[index];
+      final monitorProfile = profile.monitorsProfile.where( (p) => p.id == monitor.id).firstOrNull;
+      if (monitorProfile != null) {
         monitor.setBrightness(monitorProfile.brightness);
       }
     }

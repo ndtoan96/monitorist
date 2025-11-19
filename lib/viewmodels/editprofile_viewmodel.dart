@@ -80,6 +80,7 @@ class EditProfileViewModel extends ChangeNotifier {
           id: monitorViewModel.id,
           name: monitorViewModel.name,
           baselineBrightness: monitorViewModel.brightness,
+          brightness: monitorViewModel.brightness,
           isIncluded: true,
           exists: true,
           parent: this,
@@ -91,12 +92,18 @@ class EditProfileViewModel extends ChangeNotifier {
 
   void _loadMonitors(List<MonitorProfile> monitorsProfile) {
     for (final monitorViewModel in _monitorsViewModel.monitorViewModels) {
+      final monitorProfile = monitorsProfile
+          .where((mp) => mp.id == monitorViewModel.id)
+          .firstOrNull;
       editProfileMonitorViewModels.add(
         EditProfileMonitorViewModel(
           id: monitorViewModel.id,
           name: monitorViewModel.name,
           baselineBrightness: monitorViewModel.brightness,
-          isIncluded: monitorsProfile.any((mp) => mp.id == monitorViewModel.id),
+          brightness: monitorProfile != null
+              ? monitorProfile.brightness
+              : monitorViewModel.brightness,
+          isIncluded: monitorProfile != null,
           exists: true,
           parent: this,
           monitorViewModel: monitorViewModel,
@@ -113,6 +120,7 @@ class EditProfileViewModel extends ChangeNotifier {
             id: monitorProfile.id,
             name: monitorProfile.id,
             baselineBrightness: monitorProfile.brightness,
+            brightness: monitorProfile.brightness,
             isIncluded: true,
             exists: false,
             parent: this,
@@ -258,13 +266,14 @@ class EditProfileMonitorViewModel extends ChangeNotifier {
   EditProfileMonitorViewModel({
     required this.id,
     required this.name,
+    required double brightness,
     required double baselineBrightness,
     required bool isIncluded,
     required this.exists,
     required EditProfileViewModel parent,
     MonitorViewModel? monitorViewModel,
-  }) : _brightness = monitorViewModel?.brightness ?? 0,
-       _baselineBrightness = baselineBrightness,
+  }) : _baselineBrightness = baselineBrightness,
+       _brightness = brightness,
        _isIncluded = isIncluded,
        _parent = parent,
        _monitorViewModel = monitorViewModel;
