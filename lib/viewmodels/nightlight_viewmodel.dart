@@ -20,10 +20,10 @@ class NightlightViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setStrength(double strength) {
-    _nightlightService.setStrength(strength);
+  Future<void> setStrength(double strength) async {
     _strength = strength;
     notifyListeners();
+    _nightlightService.setStrength(strength);
   }
 
   void setActive(bool isActive) {

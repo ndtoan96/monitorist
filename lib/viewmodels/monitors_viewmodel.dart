@@ -32,6 +32,8 @@ class MonitorViewModel extends ChangeNotifier {
   String _id = "";
   String _name = "";
   double _brightness = 0.0;
+  double? _brightnessToSet;
+  bool _setBrightnessRunning = false;
   MonitorViewModel({required Monitor monitor}) : _monitor = monitor;
 
   String get id => _id;
@@ -46,9 +48,21 @@ class MonitorViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setBrightness(double value) {
-    _monitor.setBrightness(value: value.toInt());
+  Future<void> setBrightness(double value) async {
     _brightness = value;
     notifyListeners();
+    if (_setBrightnessRunning) {
+      _brightnessToSet = value;
+      return;
+    } else {
+      _setBrightnessRunning = true;
+      await _monitor.setBrightness(value: value.toInt());
+      while (_brightnessToSet != null) {
+        final nextValue = _brightnessToSet!;
+        _brightnessToSet = null;
+        await _monitor.setBrightness(value: nextValue.toInt());
+      }
+      _setBrightnessRunning = false;
+    }
   }
 }
