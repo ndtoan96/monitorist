@@ -8,14 +8,12 @@ class MonitorsViewModel extends ChangeNotifier {
   final MonitorsService _monitorsService;
   final List<MonitorViewModel> _monitorViewModels = [];
   MonitorsViewModel({required MonitorsService monitorsService})
-    : _monitorsService = monitorsService {
-    _loadMonitors();
-  }
+    : _monitorsService = monitorsService;
 
   UnmodifiableListView<MonitorViewModel> get monitorViewModels =>
       UnmodifiableListView(_monitorViewModels);
 
-  Future<void> _loadMonitors() async {
+  Future<void> loadMonitors() async {
     final monitorResults = await _monitorsService.getMonitors();
     _monitorViewModels.clear();
     for (final result in monitorResults) {
@@ -34,9 +32,7 @@ class MonitorViewModel extends ChangeNotifier {
   String _id = "";
   String _name = "";
   double _brightness = 0.0;
-  MonitorViewModel({required Monitor monitor}) : _monitor = monitor {
-    loadSettings();
-  }
+  MonitorViewModel({required Monitor monitor}) : _monitor = monitor;
 
   String get id => _id;
   String get name => _name;

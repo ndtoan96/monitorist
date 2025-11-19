@@ -68,7 +68,11 @@ class _EditViewState extends State<EditView> {
                   .map(
                     (vm) => ChangeNotifierProvider.value(
                       value: vm,
-                      child: MonitorCard(),
+                      child: MonitorCard(
+                        onRemove: () {
+                          viewModel.removeMonitor(vm.id);
+                        },
+                      ),
                     ),
                   )
                   .toList(),
@@ -138,7 +142,8 @@ class _EditViewState extends State<EditView> {
 }
 
 class MonitorCard extends StatelessWidget {
-  const MonitorCard({super.key});
+  final void Function() onRemove;
+  const MonitorCard({super.key, required this.onRemove});
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +185,7 @@ class MonitorCard extends StatelessWidget {
               viewModel.exists
                   ? SizedBox.shrink()
                   : IconButton(
-                      onPressed: () {},
+                      onPressed: onRemove,
                       icon: Icon(Icons.cancel),
                       tooltip: "Remove this monitor from the profile",
                     ),

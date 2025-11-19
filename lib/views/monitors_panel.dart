@@ -2,8 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:monitorist/viewmodels/monitors_viewmodel.dart';
 import 'package:provider/provider.dart';
 
-class MonitorsPanel extends StatelessWidget {
+class MonitorsPanel extends StatefulWidget {
   const MonitorsPanel({super.key});
+
+  @override
+  State<MonitorsPanel> createState() => _MonitorsPanelState();
+}
+
+class _MonitorsPanelState extends State<MonitorsPanel> {
+  @override
+  void initState() {
+    super.initState();
+    final viewModel = context.read<MonitorsViewModel>();
+    viewModel.loadMonitors();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,8 +43,20 @@ class MonitorsPanel extends StatelessWidget {
   }
 }
 
-class MonitorItem extends StatelessWidget {
+class MonitorItem extends StatefulWidget {
   const MonitorItem({super.key});
+
+  @override
+  State<MonitorItem> createState() => _MonitorItemState();
+}
+
+class _MonitorItemState extends State<MonitorItem> {
+  @override
+  void initState() {
+    super.initState();
+    final viewModel = context.read<MonitorViewModel>();
+    viewModel.loadSettings();
+  }
 
   @override
   Widget build(BuildContext context) {

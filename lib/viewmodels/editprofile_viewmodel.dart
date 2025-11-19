@@ -39,14 +39,14 @@ class EditProfileViewModel extends ChangeNotifier {
   }
 
   EditProfileViewModel.editProfile({
-    required name,
+    required String name,
     required NightlightViewModel nightlightViewModel,
     required MonitorsViewModel monitorsViewModel,
     required ProfilesViewModel profilesViewmodel,
   }) : _isNew = false,
        _oldName = name,
        _name = name,
-       _preview = true,
+       _preview = false,
        _nightlightViewModel = nightlightViewModel,
        _monitorsViewModel = monitorsViewModel,
        _profilesViewmodel = profilesViewmodel {
@@ -87,40 +87,21 @@ class EditProfileViewModel extends ChangeNotifier {
         ),
       );
     }
-    notifyListeners();
   }
 
   void _loadMonitors(List<MonitorProfile> monitorsProfile) {
     for (final monitorViewModel in _monitorsViewModel.monitorViewModels) {
-      final index = monitorsProfile.indexWhere(
-        (mp) => mp.id == monitorViewModel.id,
+      editProfileMonitorViewModels.add(
+        EditProfileMonitorViewModel(
+          id: monitorViewModel.id,
+          name: monitorViewModel.name,
+          baselineBrightness: monitorViewModel.brightness,
+          isIncluded: monitorsProfile.any((mp) => mp.id == monitorViewModel.id),
+          exists: true,
+          parent: this,
+          monitorViewModel: monitorViewModel,
+        ),
       );
-      if (index != -1) {
-        final monitorProfile = monitorsProfile[index];
-        editProfileMonitorViewModels.add(
-          EditProfileMonitorViewModel(
-            id: monitorViewModel.id,
-            name: monitorViewModel.name,
-            baselineBrightness: monitorViewModel.brightness,
-            isIncluded: true,
-            exists: true,
-            parent: this,
-            monitorViewModel: monitorViewModel,
-          )..setBrightness(monitorProfile.brightness),
-        );
-      } else {
-        editProfileMonitorViewModels.add(
-          EditProfileMonitorViewModel(
-            id: monitorViewModel.id,
-            name: monitorViewModel.name,
-            baselineBrightness: monitorViewModel.brightness,
-            isIncluded: false,
-            exists: true,
-            parent: this,
-            monitorViewModel: monitorViewModel,
-          ),
-        );
-      }
     }
     final existingIds = _monitorsViewModel.monitorViewModels
         .map((mp) => mp.id)
@@ -139,7 +120,6 @@ class EditProfileViewModel extends ChangeNotifier {
         );
       }
     }
-    notifyListeners();
   }
 
   bool get preview => _preview;
@@ -188,6 +168,11 @@ class EditProfileViewModel extends ChangeNotifier {
     } else {
       _profilesViewmodel.updateProfile(name: _oldName, newProfile: profile);
     }
+  }
+
+  void removeMonitor(String id) {
+    editProfileMonitorViewModels.removeWhere((vm) => vm.id == id);
+    notifyListeners();
   }
 }
 
