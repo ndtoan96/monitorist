@@ -20,7 +20,7 @@ class MonitorsViewModel extends ChangeNotifier {
       if (result.success != null) {
         _monitorViewModels.add(MonitorViewModel(monitor: result.success!));
       } else {
-        // Handle error case if needed
+        // ignore monitors that failed to load
       }
     }
     notifyListeners();

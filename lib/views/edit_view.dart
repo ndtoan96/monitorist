@@ -35,50 +35,56 @@ class _EditViewState extends State<EditView> {
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
       ),
-      body: Column(
-        children: [
-          Row(
-            children: [
-              SizedBox(
-                width: 300,
-                child: TextField(
-                  controller: _nameController,
-                  decoration: InputDecoration(border: OutlineInputBorder()),
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  onChanged: viewModel.setName,
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                SizedBox(
+                  width: 300,
+                  child: TextField(
+                    controller: _nameController,
+                    decoration: InputDecoration(border: OutlineInputBorder()),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    onChanged: viewModel.setName,
+                  ),
                 ),
-              ),
-              Checkbox(
-                value: viewModel.preview,
-                onChanged: (bool? value) {
-                  viewModel.setPreview(value ?? true);
-                },
-              ),
-              const Text("Preview"),
-            ],
-          ),
-          ChangeNotifierProvider.value(
-            value: viewModel.editProfileNightlightViewModel,
-            child: NightlightCard(),
-          ),
-          Divider(),
-          Expanded(
-            child: ListView(
-              children: viewModel.editProfileMonitorViewModels
-                  .map(
-                    (vm) => ChangeNotifierProvider.value(
-                      value: vm,
-                      child: MonitorCard(
-                        onRemove: () {
-                          viewModel.removeMonitor(vm.id);
-                        },
-                      ),
-                    ),
-                  )
-                  .toList(),
+                Checkbox(
+                  value: viewModel.preview,
+                  onChanged: (bool? value) {
+                    viewModel.setPreview(value ?? true);
+                  },
+                ),
+                const Text("Preview"),
+              ],
             ),
-          ),
-        ],
+            SizedBox(height: 16),
+            ChangeNotifierProvider.value(
+              value: viewModel.editProfileNightlightViewModel,
+              child: NightlightCard(),
+            ),
+            SizedBox(height: 16),
+            Divider(),
+            SizedBox(height: 16),
+            Expanded(
+              child: ListView(
+                children: viewModel.editProfileMonitorViewModels
+                    .map(
+                      (vm) => ChangeNotifierProvider.value(
+                        value: vm,
+                        child: MonitorCard(
+                          onRemove: () {
+                            viewModel.removeMonitor(vm.id);
+                          },
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: Row(
         mainAxisSize: MainAxisSize.min,
