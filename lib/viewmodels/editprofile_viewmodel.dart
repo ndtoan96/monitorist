@@ -5,6 +5,7 @@ import 'package:monitorist/viewmodels/nightlight_viewmodel.dart';
 import 'package:monitorist/viewmodels/profiles_viewmodel.dart';
 
 class EditProfileViewModel extends ChangeNotifier {
+  bool _isChanged = false;
   final bool _isNew;
   final String _oldName;
   String _name;
@@ -14,6 +15,9 @@ class EditProfileViewModel extends ChangeNotifier {
   final NightlightViewModel _nightlightViewModel;
   final MonitorsViewModel _monitorsViewModel;
   final ProfilesViewModel _profilesViewmodel;
+
+  bool get isChanged => _isChanged || editProfileNightlightViewModel.isChanged ||
+      editProfileMonitorViewModels.any((vm) => vm.isChanged);
 
   EditProfileViewModel.newProfile({
     required NightlightViewModel nightlightViewModel,
@@ -145,6 +149,7 @@ class EditProfileViewModel extends ChangeNotifier {
 
   void setName(String name) {
     _name = name;
+    _isChanged = true;
     notifyListeners();
   }
 
@@ -180,11 +185,13 @@ class EditProfileViewModel extends ChangeNotifier {
 
   void removeMonitor(String id) {
     editProfileMonitorViewModels.removeWhere((vm) => vm.id == id);
+    _isChanged = true;
     notifyListeners();
   }
 }
 
 class EditProfileNightlightViewModel extends ChangeNotifier {
+  bool _isChanged = false;
   bool _isEnabled;
   final bool _baselineIsEnabled;
   int? _strength;
@@ -192,6 +199,8 @@ class EditProfileNightlightViewModel extends ChangeNotifier {
   bool _isIncluded;
   final NightlightViewModel _nightlightViewModel;
   final EditProfileViewModel _parent;
+
+  bool get isChanged => _isChanged;
 
   EditProfileNightlightViewModel({
     required bool isEnabled,
@@ -215,6 +224,7 @@ class EditProfileNightlightViewModel extends ChangeNotifier {
 
   void setIncluded(bool included) {
     _isIncluded = included;
+    _isChanged = true;
     notifyListeners();
   }
 
@@ -223,6 +233,7 @@ class EditProfileNightlightViewModel extends ChangeNotifier {
     if (_parent.preview) {
       _nightlightViewModel.setActive(enabled);
     }
+    _isChanged = true;
     notifyListeners();
   }
 
@@ -231,6 +242,7 @@ class EditProfileNightlightViewModel extends ChangeNotifier {
     if (_parent.preview) {
       _nightlightViewModel.setStrength(strength);
     }
+    _isChanged = true;
     notifyListeners();
   }
 
@@ -254,6 +266,7 @@ class EditProfileNightlightViewModel extends ChangeNotifier {
 }
 
 class EditProfileMonitorViewModel extends ChangeNotifier {
+  bool _isChanged = false;
   final String id;
   final String name;
   final bool exists;
@@ -262,6 +275,8 @@ class EditProfileMonitorViewModel extends ChangeNotifier {
   bool _isIncluded;
   final EditProfileViewModel _parent;
   final MonitorViewModel? _monitorViewModel;
+
+  bool get isChanged => _isChanged;
 
   EditProfileMonitorViewModel({
     required this.id,
@@ -283,6 +298,7 @@ class EditProfileMonitorViewModel extends ChangeNotifier {
 
   void setIncluded(bool included) {
     _isIncluded = included;
+    _isChanged = true;
     notifyListeners();
   }
 
@@ -291,6 +307,7 @@ class EditProfileMonitorViewModel extends ChangeNotifier {
     if (_parent.preview) {
       _monitorViewModel?.setBrightness(brightness);
     }
+    _isChanged = true;
     notifyListeners();
   }
 

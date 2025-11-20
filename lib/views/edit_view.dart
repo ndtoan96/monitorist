@@ -115,25 +115,29 @@ class _EditViewState extends State<EditView> {
             heroTag: "cancelBtn",
             onPressed: () async {
               // Cancel editing
-              bool? confirmed = await showDialog<bool>(
-                context: context,
-                builder: (dialogContext) => AlertDialog(
-                  title: Text("Discard changes?"),
-                  content: Text(
-                    "Are you sure you want to discard your changes?",
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(dialogContext).pop(false),
-                      child: Text("No"),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.of(dialogContext).pop(true),
-                      child: Text("Yes"),
-                    ),
-                  ],
-                ),
-              );
+              bool? confirmed = viewModel.isChanged
+                  ? await showDialog<bool>(
+                      context: context,
+                      builder: (dialogContext) => AlertDialog(
+                        title: Text("Discard changes?"),
+                        content: Text(
+                          "Are you sure you want to discard your changes?",
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () =>
+                                Navigator.of(dialogContext).pop(false),
+                            child: Text("No"),
+                          ),
+                          TextButton(
+                            onPressed: () =>
+                                Navigator.of(dialogContext).pop(true),
+                            child: Text("Yes"),
+                          ),
+                        ],
+                      ),
+                    )
+                  : true;
               if (confirmed == true && context.mounted) {
                 viewModel.restoreBaseline();
                 Navigator.of(context).pop();
