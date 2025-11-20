@@ -78,8 +78,8 @@ class _MonitorItemState extends State<MonitorItem> {
                 SizedBox(
                   width: 300,
                   child: Slider(
-                    value: viewModel.brightness,
-                    onChanged: viewModel.setBrightness,
+                    value: viewModel.brightness.toDouble(),
+                    onChanged: (value) => viewModel.setBrightness(value.round()),
                     min: 0.0,
                     max: 100.0,
                     divisions: 100,

@@ -34,7 +34,7 @@ class Profile {
 
 class NightlightProfile {
   final bool isEnabled;
-  final double? strength;
+  final int? strength;
 
   NightlightProfile({required this.isEnabled, required this.strength});
   factory NightlightProfile.fromJson(Map<String, dynamic> json) {
@@ -50,7 +50,7 @@ class NightlightProfile {
 
 class MonitorProfile {
   final String id;
-  final double brightness;
+  final int brightness;
 
   MonitorProfile({required this.id, required this.brightness});
   factory MonitorProfile.fromJson(Map<String, dynamic> json) {

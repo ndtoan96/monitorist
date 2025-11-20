@@ -31,23 +31,25 @@ class MonitorViewModel extends ChangeNotifier {
   final Monitor _monitor;
   final String _id;
   String _name = "";
-  double _brightness = 0.0;
-  double? _brightnessToSet;
+  int _brightness = 0;
+  int? _brightnessToSet;
   bool _setBrightnessRunning = false;
-  MonitorViewModel({required Monitor monitor}) : _monitor = monitor, _id = monitor.devicePath();
+  MonitorViewModel({required Monitor monitor})
+    : _monitor = monitor,
+      _id = monitor.devicePath();
 
   String get id => _id;
   String get name => _name;
-  double get brightness => _brightness;
+  int get brightness => _brightness;
 
   Future<void> loadSettings() async {
     _name = await _monitor.displayName();
     final brightnessValue = await _monitor.getBrightness();
-    _brightness = brightnessValue.toDouble();
+    _brightness = brightnessValue;
     notifyListeners();
   }
 
-  Future<void> setBrightness(double value) async {
+  Future<void> setBrightness(int value) async {
     _brightness = value;
     notifyListeners();
     if (_setBrightnessRunning) {
@@ -55,11 +57,11 @@ class MonitorViewModel extends ChangeNotifier {
       return;
     } else {
       _setBrightnessRunning = true;
-      await _monitor.setBrightness(value: value.toInt());
+      await _monitor.setBrightness(value: value);
       while (_brightnessToSet != null) {
         final nextValue = _brightnessToSet!;
         _brightnessToSet = null;
-        await _monitor.setBrightness(value: nextValue.toInt());
+        await _monitor.setBrightness(value: nextValue);
       }
       _setBrightnessRunning = false;
     }

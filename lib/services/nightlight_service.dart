@@ -5,8 +5,8 @@ class NightlightService {
     return nightlight_api.loadSettings();
   }
 
-  void setStrength(double strength) {
-    nightlight_api.setWarmth(strength: strength);
+  void setStrength(int strength) {
+    nightlight_api.setWarmth(warm: strength.toDouble() / 100.0);
   }
 
   void setActive(bool isActive) {

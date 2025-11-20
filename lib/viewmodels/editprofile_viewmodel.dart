@@ -187,8 +187,8 @@ class EditProfileViewModel extends ChangeNotifier {
 class EditProfileNightlightViewModel extends ChangeNotifier {
   bool _isEnabled;
   final bool _baselineIsEnabled;
-  double? _strength;
-  final double? _baselineStrength;
+  int? _strength;
+  final int? _baselineStrength;
   bool _isIncluded;
   final NightlightViewModel _nightlightViewModel;
   final EditProfileViewModel _parent;
@@ -196,8 +196,8 @@ class EditProfileNightlightViewModel extends ChangeNotifier {
   EditProfileNightlightViewModel({
     required bool isEnabled,
     required bool baselineIsEnabled,
-    required double? strength,
-    required double? baselineStrength,
+    required int? strength,
+    required int? baselineStrength,
     required bool isIncluded,
     required EditProfileViewModel parent,
     required NightlightViewModel nightlightViewModel,
@@ -210,7 +210,7 @@ class EditProfileNightlightViewModel extends ChangeNotifier {
        _nightlightViewModel = nightlightViewModel;
 
   bool get isEnabled => _isEnabled;
-  double? get strength => _strength;
+  int? get strength => _strength;
   bool get isIncluded => _isIncluded;
 
   void setIncluded(bool included) {
@@ -226,7 +226,7 @@ class EditProfileNightlightViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setStrength(double strength) {
+  void setStrength(int strength) {
     _strength = strength;
     if (_parent.preview) {
       _nightlightViewModel.setStrength(strength);
@@ -257,8 +257,8 @@ class EditProfileMonitorViewModel extends ChangeNotifier {
   final String id;
   final String name;
   final bool exists;
-  double _brightness;
-  final double _baselineBrightness;
+  int _brightness;
+  final int _baselineBrightness;
   bool _isIncluded;
   final EditProfileViewModel _parent;
   final MonitorViewModel? _monitorViewModel;
@@ -266,8 +266,8 @@ class EditProfileMonitorViewModel extends ChangeNotifier {
   EditProfileMonitorViewModel({
     required this.id,
     required this.name,
-    required double brightness,
-    required double baselineBrightness,
+    required int brightness,
+    required int baselineBrightness,
     required bool isIncluded,
     required this.exists,
     required EditProfileViewModel parent,
@@ -278,7 +278,7 @@ class EditProfileMonitorViewModel extends ChangeNotifier {
        _parent = parent,
        _monitorViewModel = monitorViewModel;
 
-  double get brightness => _brightness;
+  int get brightness => _brightness;
   bool get isIncluded => _isIncluded;
 
   void setIncluded(bool included) {
@@ -286,7 +286,7 @@ class EditProfileMonitorViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setBrightness(double brightness) {
+  void setBrightness(int brightness) {
     _brightness = brightness;
     if (_parent.preview) {
       _monitorViewModel?.setBrightness(brightness);

@@ -180,13 +180,15 @@ class MonitorCard extends StatelessWidget {
               ),
               Text(viewModel.name),
               Slider(
-                value: viewModel.brightness,
-                onChanged: viewModel.exists ? viewModel.setBrightness : null,
+                value: viewModel.brightness.toDouble(),
+                onChanged: viewModel.exists
+                    ? (value) => viewModel.setBrightness(value.round())
+                    : null,
                 min: 0,
                 max: 100,
                 divisions: 100,
               ),
-              Text(viewModel.brightness.toInt().toString()),
+              Text(viewModel.brightness.toString()),
               Spacer(),
               viewModel.exists
                   ? SizedBox.shrink()
@@ -236,9 +238,9 @@ class _NightlightCardState extends State<NightlightCard> {
             Text("Nightlight"),
             viewModel.strength != null
                 ? Slider(
-                    value: viewModel.strength!,
+                    value: viewModel.strength!.toDouble(),
                     onChanged: viewModel.isEnabled
-                        ? viewModel.setStrength
+                        ? (value) => viewModel.setStrength(value.round())
                         : null,
                     min: 0,
                     max: 100,
@@ -246,7 +248,7 @@ class _NightlightCardState extends State<NightlightCard> {
                   )
                 : SizedBox.shrink(),
             viewModel.strength != null
-                ? Text(viewModel.strength!.toInt().toString())
+                ? Text(viewModel.strength!.toString())
                 : SizedBox.shrink(),
             Switch(value: viewModel.isEnabled, onChanged: viewModel.setEnabled),
           ],

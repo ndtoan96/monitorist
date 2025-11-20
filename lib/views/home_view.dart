@@ -96,9 +96,9 @@ class _NightlightPanelState extends State<NightlightPanel> {
                     SizedBox(
                       width: 300,
                       child: Slider(
-                        value: viewModel.strength!,
+                        value: viewModel.strength!.toDouble(),
                         onChanged: viewModel.isEnabled
-                            ? viewModel.setStrength
+                            ? (value) => viewModel.setStrength(value.round())
                             : null,
                         min: 0.0,
                         max: 100.0,
@@ -122,18 +122,16 @@ class _NightlightPanelState extends State<NightlightPanel> {
                           isDense: true,
                         ),
                         onSubmitted: (textValue) {
-                          final value = double.tryParse(textValue);
+                          final value = int.tryParse(textValue);
                           if (value != null) {
-                            viewModel.setStrength(value.clamp(0.0, 100.0));
+                            viewModel.setStrength(value.clamp(0, 100));
                             _nightlightStrengthController.text = value
-                                .clamp(0.0, 100.0)
-                                .toInt()
+                                .clamp(0, 100)
                                 .toString();
                           } else {
                             // Reset to current value if parsing fails
                             _nightlightStrengthController.text = viewModel
                                 .strength!
-                                .toInt()
                                 .toString();
                           }
                         },
