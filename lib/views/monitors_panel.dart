@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:monitorist/viewmodels/monitors_viewmodel.dart';
 import 'package:provider/provider.dart';
 
@@ -51,11 +52,32 @@ class MonitorItem extends StatefulWidget {
 }
 
 class _MonitorItemState extends State<MonitorItem> {
+  late TextEditingController _brightnessController;
+  late FocusNode _focusNode;
+
   @override
   void initState() {
     super.initState();
     final viewModel = context.read<MonitorViewModel>();
     viewModel.loadSettings();
+    _brightnessController = TextEditingController(
+      text: viewModel.brightness.toString(),
+    );
+    viewModel.addListener(() {
+      _brightnessController.text = viewModel.brightness.toString();
+    });
+    _focusNode = FocusNode();
+    _focusNode.addListener(() {
+      if (!_focusNode.hasFocus) {
+        _brightnessController.text = viewModel.brightness.toString();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _brightnessController.dispose();
+    super.dispose();
   }
 
   @override
@@ -79,16 +101,41 @@ class _MonitorItemState extends State<MonitorItem> {
                   width: 300,
                   child: Slider(
                     value: viewModel.brightness.toDouble(),
-                    onChanged: (value) => viewModel.setBrightness(value.round()),
+                    onChanged: (value) =>
+                        viewModel.setBrightness(value.round()),
                     min: 0.0,
                     max: 100.0,
                     divisions: 100,
                     label: "Brightness",
                   ),
                 ),
-                Text(
-                  "${viewModel.brightness.toInt()}",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                SizedBox(
+                  width: 80,
+                  child: TextField(
+                    controller: _brightnessController,
+                    focusNode: _focusNode,
+                    decoration: InputDecoration(
+                      border: UnderlineInputBorder(),
+                      isDense: true,
+                    ),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    onSubmitted: (value) {
+                      final brightness = int.tryParse(value);
+                      if (brightness != null) {
+                        viewModel.setBrightness(brightness.clamp(0, 100));
+                      } else {
+                        _brightnessController.text = viewModel.brightness
+                            .toString();
+                      }
+                    },
+                    onTapOutside: (_) {
+                      _brightnessController.text = viewModel.brightness
+                          .toString();
+                    },
+                  ),
                 ),
               ],
             ),

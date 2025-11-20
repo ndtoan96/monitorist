@@ -50,6 +50,7 @@ class NightlightPanel extends StatefulWidget {
 
 class _NightlightPanelState extends State<NightlightPanel> {
   late TextEditingController _nightlightStrengthController;
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -69,6 +70,13 @@ class _NightlightPanelState extends State<NightlightPanel> {
             .toString();
       } else {
         _nightlightStrengthController.text = '';
+      }
+    });
+    _focusNode.addListener(() {
+      if (!_focusNode.hasFocus && viewModel.strength != null) {
+        _nightlightStrengthController.text = viewModel.strength!
+            .toInt()
+            .toString();
       }
     });
   }
@@ -109,8 +117,9 @@ class _NightlightPanelState extends State<NightlightPanel> {
                     SizedBox(
                       width: 60,
                       child: TextField(
-                        readOnly: viewModel.isEnabled ? false : true,
+                        readOnly: !viewModel.isEnabled,
                         controller: _nightlightStrengthController,
+                        focusNode: _focusNode,
                         keyboardType: TextInputType.number,
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
