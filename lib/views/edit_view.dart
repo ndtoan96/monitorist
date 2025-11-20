@@ -161,20 +161,18 @@ class MonitorCard extends StatefulWidget {
 }
 
 class _MonitorCardState extends State<MonitorCard> {
-  late final TextEditingController _brightnessController;
-  late final FocusNode _focusNode;
+  final TextEditingController _brightnessController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+  final FocusNode _keyboardFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     final viewModel = context.read<EditProfileMonitorViewModel>();
-    _brightnessController = TextEditingController(
-      text: viewModel.brightness.toString(),
-    );
+    _brightnessController.text = viewModel.brightness.toString();
     viewModel.addListener(() {
       _brightnessController.text = viewModel.brightness.toString();
     });
-    _focusNode = FocusNode();
     _focusNode.addListener(() {
       if (!_focusNode.hasFocus) {
         _brightnessController.text = viewModel.brightness.toString();
@@ -186,6 +184,7 @@ class _MonitorCardState extends State<MonitorCard> {
   void dispose() {
     _brightnessController.dispose();
     _focusNode.dispose();
+    _keyboardFocusNode.dispose();
     super.dispose();
   }
 
@@ -228,26 +227,35 @@ class _MonitorCardState extends State<MonitorCard> {
               ),
               SizedBox(
                 width: 60,
-                child: TextField(
-                  controller: _brightnessController,
-                  focusNode: _focusNode,
-                  decoration: InputDecoration(
-                    border: UnderlineInputBorder(),
-                    isDense: true,
-                  ),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  onSubmitted: (value) {
-                    final brightness = int.tryParse(value);
-                    if (brightness != null) {
-                      viewModel.setBrightness(brightness.clamp(0, 100));
-                    } else {
-                      _brightnessController.text = viewModel.brightness
-                          .toString();
+                child: KeyboardListener(
+                  focusNode: _keyboardFocusNode,
+                  onKeyEvent: (event) {
+                    if (event is KeyDownEvent &&
+                        event.logicalKey == LogicalKeyboardKey.escape) {
+                      _focusNode.unfocus();
                     }
                   },
+                  child: TextField(
+                    controller: _brightnessController,
+                    focusNode: _focusNode,
+                    decoration: InputDecoration(
+                      border: UnderlineInputBorder(),
+                      isDense: true,
+                    ),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    onSubmitted: (value) {
+                      final brightness = int.tryParse(value);
+                      if (brightness != null) {
+                        viewModel.setBrightness(brightness.clamp(0, 100));
+                      } else {
+                        _brightnessController.text = viewModel.brightness
+                            .toString();
+                      }
+                    },
+                  ),
                 ),
               ),
               Spacer(),
@@ -279,13 +287,14 @@ class NightlightCard extends StatefulWidget {
 }
 
 class _NightlightCardState extends State<NightlightCard> {
-  late final TextEditingController _nightlightStrengthController;
-  late final FocusNode _focusNode;
+  final TextEditingController _nightlightStrengthController =
+      TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+  final FocusNode _keyboardFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    _nightlightStrengthController = TextEditingController();
     final viewModel = context.read<EditProfileNightlightViewModel>();
     if (viewModel.strength != null) {
       _nightlightStrengthController.text = viewModel.strength!.toString();
@@ -297,7 +306,6 @@ class _NightlightCardState extends State<NightlightCard> {
         _nightlightStrengthController.text = '';
       }
     });
-    _focusNode = FocusNode();
     _focusNode.addListener(() {
       if (!_focusNode.hasFocus && viewModel.strength != null) {
         _nightlightStrengthController.text = viewModel.strength!.toString();
@@ -309,6 +317,7 @@ class _NightlightCardState extends State<NightlightCard> {
   void dispose() {
     _nightlightStrengthController.dispose();
     _focusNode.dispose();
+    _keyboardFocusNode.dispose();
     super.dispose();
   }
 
@@ -344,31 +353,42 @@ class _NightlightCardState extends State<NightlightCard> {
             viewModel.strength != null
                 ? SizedBox(
                     width: 80,
-                    child: TextField(
-                      readOnly: !viewModel.isEnabled,
-                      controller: _nightlightStrengthController,
-                      focusNode: _focusNode,
-                      decoration: InputDecoration(
-                        border: UnderlineInputBorder(),
-                        isDense: true,
-                      ),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      onSubmitted: (value) {
-                        final strength = int.tryParse(value);
-                        if (strength != null) {
-                          viewModel.setStrength(strength.clamp(0, 100));
-                        } else {
-                          _nightlightStrengthController.text = viewModel
-                              .strength!
-                              .toString();
+                    child: KeyboardListener(
+                      focusNode: _keyboardFocusNode,
+                      onKeyEvent: (event) {
+                        if (event is KeyDownEvent &&
+                            event.logicalKey == LogicalKeyboardKey.escape) {
+                          _focusNode.unfocus();
                         }
                       },
+                      child: TextField(
+                        readOnly: !viewModel.isEnabled,
+                        controller: _nightlightStrengthController,
+                        focusNode: _focusNode,
+                        decoration: InputDecoration(
+                          border: UnderlineInputBorder(),
+                          isDense: true,
+                        ),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        onSubmitted: (value) {
+                          final strength = int.tryParse(value);
+                          if (strength != null) {
+                            viewModel.setStrength(strength.clamp(0, 100));
+                          } else {
+                            _nightlightStrengthController.text = viewModel
+                                .strength!
+                                .toString();
+                          }
+                        },
+                      ),
                     ),
                   )
                 : SizedBox.shrink(),

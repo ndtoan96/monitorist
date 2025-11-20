@@ -49,19 +49,19 @@ class NightlightPanel extends StatefulWidget {
 }
 
 class _NightlightPanelState extends State<NightlightPanel> {
-  late TextEditingController _nightlightStrengthController;
+  final TextEditingController _nightlightStrengthController =
+      TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  final FocusNode _keyboardFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     final viewModel = context.read<NightlightViewModel>();
     if (viewModel.strength != null) {
-      _nightlightStrengthController = TextEditingController(
-        text: viewModel.strength!.toInt().toString(),
-      );
-    } else {
-      _nightlightStrengthController = TextEditingController();
+      _nightlightStrengthController.text = viewModel.strength!
+          .toInt()
+          .toString();
     }
     viewModel.addListener(() {
       if (viewModel.strength != null) {
@@ -85,6 +85,7 @@ class _NightlightPanelState extends State<NightlightPanel> {
   void dispose() {
     _nightlightStrengthController.dispose();
     _focusNode.dispose();
+    _keyboardFocusNode.dispose();
     super.dispose();
   }
 
@@ -123,34 +124,43 @@ class _NightlightPanelState extends State<NightlightPanel> {
                     ),
                     SizedBox(
                       width: 60,
-                      child: TextField(
-                        readOnly: !viewModel.isEnabled,
-                        controller: _nightlightStrengthController,
-                        focusNode: _focusNode,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                        ],
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                        decoration: InputDecoration(
-                          border: UnderlineInputBorder(),
-                          isDense: true,
-                        ),
-                        onSubmitted: (textValue) {
-                          final value = int.tryParse(textValue);
-                          if (value != null) {
-                            viewModel.setStrength(value.clamp(0, 100));
-                            _nightlightStrengthController.text = value
-                                .clamp(0, 100)
-                                .toString();
-                          } else {
-                            // Reset to current value if parsing fails
-                            _nightlightStrengthController.text = viewModel
-                                .strength!
-                                .toString();
+                      child: KeyboardListener(
+                        focusNode: _keyboardFocusNode,
+                        onKeyEvent: (event) {
+                          if (event is KeyDownEvent &&
+                              event.logicalKey == LogicalKeyboardKey.escape) {
+                            _focusNode.unfocus();
                           }
                         },
+                        child: TextField(
+                          readOnly: !viewModel.isEnabled,
+                          controller: _nightlightStrengthController,
+                          focusNode: _focusNode,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                          decoration: InputDecoration(
+                            border: UnderlineInputBorder(),
+                            isDense: true,
+                          ),
+                          onSubmitted: (textValue) {
+                            final value = int.tryParse(textValue);
+                            if (value != null) {
+                              viewModel.setStrength(value.clamp(0, 100));
+                              _nightlightStrengthController.text = value
+                                  .clamp(0, 100)
+                                  .toString();
+                            } else {
+                              // Reset to current value if parsing fails
+                              _nightlightStrengthController.text = viewModel
+                                  .strength!
+                                  .toString();
+                            }
+                          },
+                        ),
                       ),
                     ),
                   ],
