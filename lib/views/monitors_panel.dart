@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:monitorist/components/reactive_text_field.dart';
 import 'package:monitorist/viewmodels/monitors_viewmodel.dart';
 import 'package:provider/provider.dart';
 
@@ -52,32 +53,11 @@ class MonitorItem extends StatefulWidget {
 }
 
 class _MonitorItemState extends State<MonitorItem> {
-  final TextEditingController _brightnessController = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
-  final FocusNode _keyboardFocusNode = FocusNode();
-
   @override
   void initState() {
     super.initState();
     final viewModel = context.read<MonitorViewModel>();
     viewModel.loadSettings();
-    _brightnessController.text = viewModel.brightness.toString();
-    viewModel.addListener(() {
-      _brightnessController.text = viewModel.brightness.toString();
-    });
-    _focusNode.addListener(() {
-      if (!_focusNode.hasFocus) {
-        _brightnessController.text = viewModel.brightness.toString();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _brightnessController.dispose();
-    _focusNode.dispose();
-    _keyboardFocusNode.dispose();
-    super.dispose();
   }
 
   @override
@@ -111,42 +91,9 @@ class _MonitorItemState extends State<MonitorItem> {
                 ),
                 SizedBox(
                   width: 80,
-                  child: KeyboardListener(
-                    focusNode: _keyboardFocusNode,
-                    onKeyEvent: (event) {
-                      if (event is KeyDownEvent &&
-                          event.logicalKey == LogicalKeyboardKey.escape) {
-                        _focusNode.unfocus();
-                      }
-                    },
-                    child: TextField(
-                      controller: _brightnessController,
-                      focusNode: _focusNode,
-                      decoration: InputDecoration(
-                        border: UnderlineInputBorder(),
-                        isDense: true,
-                      ),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      onSubmitted: (value) {
-                        final brightness = int.tryParse(value);
-                        if (brightness != null) {
-                          viewModel.setBrightness(brightness.clamp(0, 100));
-                        } else {
-                          _brightnessController.text = viewModel.brightness
-                              .toString();
-                        }
-                      },
-                      onTapOutside: (_) {
-                        _brightnessController.text = viewModel.brightness
-                            .toString();
-                      },
-                    ),
+                  child: ReactiveTextField(
+                    value: viewModel.brightness,
+                    setValue: viewModel.setBrightness,
                   ),
                 ),
               ],

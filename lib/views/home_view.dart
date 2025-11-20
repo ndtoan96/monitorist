@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:monitorist/components/reactive_text_field.dart';
 import 'package:monitorist/viewmodels/nightlight_viewmodel.dart';
 import 'package:monitorist/views/monitors_panel.dart';
 import 'package:monitorist/views/profiles_panel.dart';
@@ -41,53 +41,8 @@ class HomeView extends StatelessWidget {
   }
 }
 
-class NightlightPanel extends StatefulWidget {
+class NightlightPanel extends StatelessWidget {
   const NightlightPanel({super.key});
-
-  @override
-  State<NightlightPanel> createState() => _NightlightPanelState();
-}
-
-class _NightlightPanelState extends State<NightlightPanel> {
-  final TextEditingController _nightlightStrengthController =
-      TextEditingController();
-  final FocusNode _focusNode = FocusNode();
-  final FocusNode _keyboardFocusNode = FocusNode();
-
-  @override
-  void initState() {
-    super.initState();
-    final viewModel = context.read<NightlightViewModel>();
-    if (viewModel.strength != null) {
-      _nightlightStrengthController.text = viewModel.strength!
-          .toInt()
-          .toString();
-    }
-    viewModel.addListener(() {
-      if (viewModel.strength != null) {
-        _nightlightStrengthController.text = viewModel.strength!
-            .toInt()
-            .toString();
-      } else {
-        _nightlightStrengthController.text = '';
-      }
-    });
-    _focusNode.addListener(() {
-      if (!_focusNode.hasFocus && viewModel.strength != null) {
-        _nightlightStrengthController.text = viewModel.strength!
-            .toInt()
-            .toString();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _nightlightStrengthController.dispose();
-    _focusNode.dispose();
-    _keyboardFocusNode.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -123,44 +78,11 @@ class _NightlightPanelState extends State<NightlightPanel> {
                       ),
                     ),
                     SizedBox(
-                      width: 60,
-                      child: KeyboardListener(
-                        focusNode: _keyboardFocusNode,
-                        onKeyEvent: (event) {
-                          if (event is KeyDownEvent &&
-                              event.logicalKey == LogicalKeyboardKey.escape) {
-                            _focusNode.unfocus();
-                          }
-                        },
-                        child: TextField(
-                          readOnly: !viewModel.isEnabled,
-                          controller: _nightlightStrengthController,
-                          focusNode: _focusNode,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
-                          decoration: InputDecoration(
-                            border: UnderlineInputBorder(),
-                            isDense: true,
-                          ),
-                          onSubmitted: (textValue) {
-                            final value = int.tryParse(textValue);
-                            if (value != null) {
-                              viewModel.setStrength(value.clamp(0, 100));
-                              _nightlightStrengthController.text = value
-                                  .clamp(0, 100)
-                                  .toString();
-                            } else {
-                              // Reset to current value if parsing fails
-                              _nightlightStrengthController.text = viewModel
-                                  .strength!
-                                  .toString();
-                            }
-                          },
-                        ),
+                      width: 80,
+                      child: ReactiveTextField(
+                        value: viewModel.strength!,
+                        setValue: viewModel.setStrength,
+                        readOnly: !viewModel.isEnabled,
                       ),
                     ),
                   ],

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:monitorist/components/reactive_text_field.dart';
 import 'package:monitorist/services/profiles_service.dart';
 import 'package:monitorist/viewmodels/editprofile_viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -152,41 +152,9 @@ class _EditViewState extends State<EditView> {
   }
 }
 
-class MonitorCard extends StatefulWidget {
+class MonitorCard extends StatelessWidget {
   final void Function() onRemove;
   const MonitorCard({super.key, required this.onRemove});
-
-  @override
-  State<MonitorCard> createState() => _MonitorCardState();
-}
-
-class _MonitorCardState extends State<MonitorCard> {
-  final TextEditingController _brightnessController = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
-  final FocusNode _keyboardFocusNode = FocusNode();
-
-  @override
-  void initState() {
-    super.initState();
-    final viewModel = context.read<EditProfileMonitorViewModel>();
-    _brightnessController.text = viewModel.brightness.toString();
-    viewModel.addListener(() {
-      _brightnessController.text = viewModel.brightness.toString();
-    });
-    _focusNode.addListener(() {
-      if (!_focusNode.hasFocus) {
-        _brightnessController.text = viewModel.brightness.toString();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _brightnessController.dispose();
-    _focusNode.dispose();
-    _keyboardFocusNode.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -226,43 +194,17 @@ class _MonitorCardState extends State<MonitorCard> {
                 divisions: 100,
               ),
               SizedBox(
-                width: 60,
-                child: KeyboardListener(
-                  focusNode: _keyboardFocusNode,
-                  onKeyEvent: (event) {
-                    if (event is KeyDownEvent &&
-                        event.logicalKey == LogicalKeyboardKey.escape) {
-                      _focusNode.unfocus();
-                    }
-                  },
-                  child: TextField(
-                    controller: _brightnessController,
-                    focusNode: _focusNode,
-                    decoration: InputDecoration(
-                      border: UnderlineInputBorder(),
-                      isDense: true,
-                    ),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    onSubmitted: (value) {
-                      final brightness = int.tryParse(value);
-                      if (brightness != null) {
-                        viewModel.setBrightness(brightness.clamp(0, 100));
-                      } else {
-                        _brightnessController.text = viewModel.brightness
-                            .toString();
-                      }
-                    },
-                  ),
+                width: 80,
+                child: ReactiveTextField(
+                  value: viewModel.brightness,
+                  setValue: viewModel.setBrightness,
                 ),
               ),
               Spacer(),
               viewModel.exists
                   ? SizedBox.shrink()
                   : IconButton(
-                      onPressed: widget.onRemove,
+                      onPressed: onRemove,
                       icon: Icon(Icons.cancel),
                       tooltip: "Remove this monitor from the profile",
                     ),
@@ -279,47 +221,8 @@ class _MonitorCardState extends State<MonitorCard> {
   }
 }
 
-class NightlightCard extends StatefulWidget {
+class NightlightCard extends StatelessWidget {
   const NightlightCard({super.key});
-
-  @override
-  State<NightlightCard> createState() => _NightlightCardState();
-}
-
-class _NightlightCardState extends State<NightlightCard> {
-  final TextEditingController _nightlightStrengthController =
-      TextEditingController();
-  final FocusNode _focusNode = FocusNode();
-  final FocusNode _keyboardFocusNode = FocusNode();
-
-  @override
-  void initState() {
-    super.initState();
-    final viewModel = context.read<EditProfileNightlightViewModel>();
-    if (viewModel.strength != null) {
-      _nightlightStrengthController.text = viewModel.strength!.toString();
-    }
-    viewModel.addListener(() {
-      if (viewModel.strength != null) {
-        _nightlightStrengthController.text = viewModel.strength!.toString();
-      } else {
-        _nightlightStrengthController.text = '';
-      }
-    });
-    _focusNode.addListener(() {
-      if (!_focusNode.hasFocus && viewModel.strength != null) {
-        _nightlightStrengthController.text = viewModel.strength!.toString();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _nightlightStrengthController.dispose();
-    _focusNode.dispose();
-    _keyboardFocusNode.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -353,42 +256,10 @@ class _NightlightCardState extends State<NightlightCard> {
             viewModel.strength != null
                 ? SizedBox(
                     width: 80,
-                    child: KeyboardListener(
-                      focusNode: _keyboardFocusNode,
-                      onKeyEvent: (event) {
-                        if (event is KeyDownEvent &&
-                            event.logicalKey == LogicalKeyboardKey.escape) {
-                          _focusNode.unfocus();
-                        }
-                      },
-                      child: TextField(
-                        readOnly: !viewModel.isEnabled,
-                        controller: _nightlightStrengthController,
-                        focusNode: _focusNode,
-                        decoration: InputDecoration(
-                          border: UnderlineInputBorder(),
-                          isDense: true,
-                        ),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                        ],
-                        onSubmitted: (value) {
-                          final strength = int.tryParse(value);
-                          if (strength != null) {
-                            viewModel.setStrength(strength.clamp(0, 100));
-                          } else {
-                            _nightlightStrengthController.text = viewModel
-                                .strength!
-                                .toString();
-                          }
-                        },
-                      ),
+                    child: ReactiveTextField(
+                      value: viewModel.strength!,
+                      setValue: viewModel.setStrength,
+                      readOnly: !viewModel.isEnabled,
                     ),
                   )
                 : SizedBox.shrink(),
