@@ -77,6 +77,7 @@ class _MonitorItemState extends State<MonitorItem> {
   @override
   void dispose() {
     _brightnessController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 

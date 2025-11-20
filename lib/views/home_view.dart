@@ -82,6 +82,13 @@ class _NightlightPanelState extends State<NightlightPanel> {
   }
 
   @override
+  void dispose() {
+    _nightlightStrengthController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<NightlightViewModel>();
     return Container(

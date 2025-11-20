@@ -183,6 +183,13 @@ class _MonitorCardState extends State<MonitorCard> {
   }
 
   @override
+  void dispose() {
+    _brightnessController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<EditProfileMonitorViewModel>();
     final card = Card(
@@ -301,6 +308,7 @@ class _NightlightCardState extends State<NightlightCard> {
   @override
   void dispose() {
     _nightlightStrengthController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
