@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:monitorist/viewmodels/nightlight_viewmodel.dart';
 import 'package:monitorist/views/monitors_panel.dart';
 import 'package:monitorist/views/profiles_panel.dart';
@@ -32,10 +33,7 @@ class HomeView extends StatelessWidget {
             ),
           ),
           VerticalDivider(),
-          Expanded(
-            flex: 1,
-            child: ProfilesPanel(),
-          ),
+          Expanded(flex: 1, child: ProfilesPanel()),
           SizedBox(width: 8),
         ],
       ),
@@ -43,8 +41,37 @@ class HomeView extends StatelessWidget {
   }
 }
 
-class NightlightPanel extends StatelessWidget {
+class NightlightPanel extends StatefulWidget {
   const NightlightPanel({super.key});
+
+  @override
+  State<NightlightPanel> createState() => _NightlightPanelState();
+}
+
+class _NightlightPanelState extends State<NightlightPanel> {
+  late TextEditingController _nightlightStrengthController;
+
+  @override
+  void initState() {
+    super.initState();
+    final viewModel = context.read<NightlightViewModel>();
+    if (viewModel.strength != null) {
+      _nightlightStrengthController = TextEditingController(
+        text: viewModel.strength!.toInt().toString(),
+      );
+    } else {
+      _nightlightStrengthController = TextEditingController();
+    }
+    viewModel.addListener(() {
+      if (viewModel.strength != null) {
+        _nightlightStrengthController.text = viewModel.strength!
+            .toInt()
+            .toString();
+      } else {
+        _nightlightStrengthController.text = '';
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,11 +106,37 @@ class NightlightPanel extends StatelessWidget {
                         label: 'Strength',
                       ),
                     ),
-                    Text(
-                      "${viewModel.strength!.toInt()}",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                    SizedBox(
+                      width: 60,
+                      child: TextField(
+                        readOnly: viewModel.isEnabled ? false : true,
+                        controller: _nightlightStrengthController,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                        decoration: InputDecoration(
+                          border: UnderlineInputBorder(),
+                          isDense: true,
+                        ),
+                        onSubmitted: (textValue) {
+                          final value = double.tryParse(textValue);
+                          if (value != null) {
+                            viewModel.setStrength(value.clamp(0.0, 100.0));
+                            _nightlightStrengthController.text = value
+                                .clamp(0.0, 100.0)
+                                .toInt()
+                                .toString();
+                          } else {
+                            // Reset to current value if parsing fails
+                            _nightlightStrengthController.text = viewModel
+                                .strength!
+                                .toInt()
+                                .toString();
+                          }
+                        },
                       ),
                     ),
                   ],
