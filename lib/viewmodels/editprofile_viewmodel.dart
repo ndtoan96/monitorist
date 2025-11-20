@@ -248,20 +248,20 @@ class EditProfileNightlightViewModel extends ChangeNotifier {
 
   void onPreviewChange() {
     if (_parent.preview) {
-      _nightlightViewModel.setActive(_isEnabled);
       if (_strength != null) {
         _nightlightViewModel.setStrength(_strength!);
       }
+      _nightlightViewModel.setActive(_isEnabled);
     } else {
       restoreBaseline();
     }
   }
 
   void restoreBaseline() {
-    _nightlightViewModel.setActive(_baselineIsEnabled);
     if (_baselineStrength != null) {
       _nightlightViewModel.setStrength(_baselineStrength);
     }
+    _nightlightViewModel.setActive(_baselineIsEnabled);
   }
 }
 
