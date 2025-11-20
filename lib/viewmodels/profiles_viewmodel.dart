@@ -42,12 +42,15 @@ class ProfilesViewModel extends ChangeNotifier {
     final profile = _profilesService.getProfile(name);
     if (profile.nightlightProfile != null) {
       _nightlightViewModel.setActive(profile.nightlightProfile!.isEnabled);
-      if (profile.nightlightProfile!.strength != null) {
+      if (profile.nightlightProfile!.isEnabled &&
+          profile.nightlightProfile!.strength != null) {
         _nightlightViewModel.setStrength(profile.nightlightProfile!.strength!);
       }
     }
     for (final monitor in _monitorsViewModel.monitorViewModels) {
-      final monitorProfile = profile.monitorsProfile.where( (p) => p.id == monitor.id).firstOrNull;
+      final monitorProfile = profile.monitorsProfile
+          .where((p) => p.id == monitor.id)
+          .firstOrNull;
       if (monitorProfile != null) {
         monitor.setBrightness(monitorProfile.brightness);
       }
