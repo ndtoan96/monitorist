@@ -9,8 +9,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 (double?, bool) loadSettings() =>
     RustLib.instance.api.crateApiNightlightLoadSettings();
 
-void setWarmth({required double strength}) =>
-    RustLib.instance.api.crateApiNightlightSetWarmth(strength: strength);
+void setWarmth({required double warm}) =>
+    RustLib.instance.api.crateApiNightlightSetWarmth(warm: warm);
 
 void setActive({required bool isActive}) =>
     RustLib.instance.api.crateApiNightlightSetActive(isActive: isActive);

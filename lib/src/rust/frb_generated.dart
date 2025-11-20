@@ -103,7 +103,7 @@ abstract class RustLibApi extends BaseApi {
 
   void crateApiNightlightSetActive({required bool isActive});
 
-  void crateApiNightlightSetWarmth({required double strength});
+  void crateApiNightlightSetWarmth({required double warm});
 
   RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Monitor;
 
@@ -450,12 +450,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "set_active", argNames: ["isActive"]);
 
   @override
-  void crateApiNightlightSetWarmth({required double strength}) {
+  void crateApiNightlightSetWarmth({required double warm}) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_f_32(strength, serializer);
+          sse_encode_f_32(warm, serializer);
           return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12)!;
         },
         codec: SseCodec(
@@ -463,14 +463,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_AnyhowException,
         ),
         constMeta: kCrateApiNightlightSetWarmthConstMeta,
-        argValues: [strength],
+        argValues: [warm],
         apiImpl: this,
       ),
     );
   }
 
   TaskConstMeta get kCrateApiNightlightSetWarmthConstMeta =>
-      const TaskConstMeta(debugName: "set_warmth", argNames: ["strength"]);
+      const TaskConstMeta(debugName: "set_warmth", argNames: ["warm"]);
 
   RustArcIncrementStrongCountFnType
   get rust_arc_increment_strong_count_Monitor => wire

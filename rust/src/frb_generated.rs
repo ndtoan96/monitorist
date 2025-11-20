@@ -598,11 +598,11 @@ fn wire__crate__api__nightlight__set_warmth_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_strength = <f32>::sse_decode(&mut deserializer);
+            let api_warm = <f32>::sse_decode(&mut deserializer);
             deserializer.end();
             transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
                 (move || {
-                    let output_ok = crate::api::nightlight::set_warmth(api_strength)?;
+                    let output_ok = crate::api::nightlight::set_warmth(api_warm)?;
                     Ok(output_ok)
                 })(),
             )
