@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monitorist/viewmodels/theme_viewmodel.dart';
 import 'package:monitorist/views/home_view.dart';
 import 'package:monitorist/services/monitors_service.dart';
 import 'package:monitorist/services/nightlight_service.dart';
@@ -34,6 +35,11 @@ Future<void> main() async {
             monitorsViewModel: context.read<MonitorsViewModel>(),
           ),
         ),
+        ChangeNotifierProvider(
+          create: (context) => ThemeViewmodel(
+            isDarkMode: Theme.of(context).brightness == Brightness.dark,
+          ),
+        ),
       ],
       child: const MyApp(),
     ),
@@ -57,7 +63,9 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.dark,
         ),
       ),
-      themeMode: ThemeMode.system,
+      themeMode: context.watch<ThemeViewmodel>().isDarkMode
+          ? ThemeMode.dark
+          : ThemeMode.light,
       home: const HomeView(),
     );
   }

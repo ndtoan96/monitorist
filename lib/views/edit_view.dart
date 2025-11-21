@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:monitorist/components/reactive_text_field.dart';
 import 'package:monitorist/services/profiles_service.dart';
 import 'package:monitorist/viewmodels/editprofile_viewmodel.dart';
+import 'package:monitorist/viewmodels/theme_viewmodel.dart';
 import 'package:provider/provider.dart';
 
 class EditView extends StatefulWidget {
@@ -35,6 +36,16 @@ class _EditViewState extends State<EditView> {
         title: viewModel.isNew ? Text("New Profile") : Text("Edit Profile"),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        actions: [
+          IconButton(
+            onPressed: () {
+              context.read<ThemeViewmodel>().toggleTheme();
+            },
+            icon: context.watch<ThemeViewmodel>().isDarkMode
+                ? Icon(Icons.light_mode)
+                : Icon(Icons.dark_mode),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),

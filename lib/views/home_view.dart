@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:monitorist/components/reactive_text_field.dart';
 import 'package:monitorist/viewmodels/nightlight_viewmodel.dart';
+import 'package:monitorist/viewmodels/theme_viewmodel.dart';
 import 'package:monitorist/views/monitors_panel.dart';
 import 'package:monitorist/views/profiles_panel.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +16,18 @@ class HomeView extends StatelessWidget {
         title: const SelectableText('Overview'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        actions: [
+          IconButton(
+            icon: Icon(
+              context.watch<ThemeViewmodel>().isDarkMode
+                  ? Icons.light_mode
+                  : Icons.dark_mode,
+            ),
+            onPressed: () {
+              context.read<ThemeViewmodel>().toggleTheme();
+            },
+          ),
+        ],
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Row(
